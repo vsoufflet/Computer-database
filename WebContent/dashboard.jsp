@@ -1,53 +1,48 @@
 <jsp:include page="include/header.jsp" />
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <section id="main">
-	<h1 id="homeTitle">456 Computers found</h1>
+	<h1 id="homeTitle">${NombreOrdinateurs}</h1>
 	<div id="actions">
-		<form action="" method="GET">
+		<form action="DashboardServlet" method="GET">
 			<input type="search" id="searchbox" name="search"
-				value="" placeholder="Search name">
-			<input type="submit" id="searchsubmit"
-				value="Filter by name"
-				class="btn primary">
+				placeholder="Search name"> <a class="btn primary"
+				id="searchsubmit" href="DashboardServlet">Filter by name</a>
 		</form>
-		<a class="btn success" id="add" href="addComputer.jsp">Add Computer</a>
+		<a class="btn success" id="add" href="addComputer.jsp">Add
+			Computer</a>
 	</div>
 
-		<table class="computers zebra-striped">
-			<thead>
-				<tr>
-					<!-- Variable declarations for passing labels as parameters -->
-					<!-- Table header for Computer Name -->
-					<th>Computer Name</th>
-					<th>Introduced Date</th>
-					<!-- Table header for Discontinued Date -->
-					<th>Discontinued Date</th>
-					<!-- Table header for Company -->
-					<th>Company</th>
-				</tr>
-			</thead>
-			<tbody>
+	<table class="computers zebra-striped">
+		<thead>
+			<tr>
+				<!-- Variable declarations for passing labels as parameters -->
+				<!-- Table header for Computer Name -->
+				<th>Computer Name</th>
+				<th>Introduced Date</th>
+				<!-- Table header for Discontinued Date -->
+				<th>Discontinued Date</th>
+				<!-- Table header for Company -->
+				<th>Company</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
 
+			<c:forEach var="entry" items="${computerList}">
 				<tr>
-					<td><a href="#" onclick="">ThinkPad T420</a></td>
-					<td>2011-01-01</td>
-					<td>2013-03-04</td>
-					<td>Lenovo</td>
+					<td><a href="EditComputerServlet?name=${entry.name}"><c:out
+								value="${entry.name}" /></a></td>
+					<td>${entry.introduced}</td>
+					<td>${entry.discontinued}</td>
+					<td>${entry.company.name}</td>
+					<td><a class="btn danger" id="Delete"
+						href="DeleteComputerServlet">Delete Computer</a></td>
 				</tr>
-				<tr>
-					<td><a href="#">Precision 3500</a></td>
-					<td>2010-05-07</td>
-					<td>2012-06-01</td>
-					<td>Dell</td>
-				</tr>
-				<tr>
-					<td><a href="#">Macbook Air</a></td>
-					<td>2005-05-09</td>
-					<td>2008-06-06</td>
-					<td>Apple</td>
-				</tr>
-			</tbody>
-		</table>
+			</c:forEach>
+
+		</tbody>
+	</table>
 </section>
 
 <jsp:include page="include/footer.jsp" />

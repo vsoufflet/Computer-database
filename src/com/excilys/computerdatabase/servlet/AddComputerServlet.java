@@ -1,79 +1,49 @@
 package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.util.Iterator;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.excilys.computerdatabase.db.DAO;
-import com.excilys.computerdatabase.dbcomponents.Computer;
+import com.excilys.computerdatabase.domain.Company;
+import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.persistence.CompanyDAO;
+import com.excilys.computerdatabase.persistence.ComputerDAO;
 
+@WebServlet("/AddComputerServlet")
 public class AddComputerServlet extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet{
-
+	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
+	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
 	public AddComputerServlet() {
 		super();
 	}
 	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		Computer computer = new Computer();
-		
-		computer.setId(Integer.parseInt(request.getParameter("id")));
-		computer.setName(request.getParameter("name"));
-		computer.setIntroduced(new Date(Date.parse(request.getParameter("introducedDate"))));
-		computer.setDiscontinued(new Date(Date.parse(request.getParameter("discontinuedDate"))));
-		
-		switch (request.getParameter("company")){
-		case "Apple":
-			computer.setCompany_id(1);
-			break;
-		case "Dell":
-			computer.setCompany_id(2);
-			break;
-		case "Lenovo":
-			computer.setCompany_id(3);
-			break;
-		default:
-			computer.setCompany_id(0);	
-		}
-		System.out.println(computer);
-		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
 		try {
+			SimpleDateFormat parser = new SimpleDateFormat("YYYY-MM-dd");
 			
-			DAO dao = new DAO();
+			Computer computer = new Computer();
+			computer.setName(request.getParameter("name"));
+			computer.setIntroduced(parser.parse(request.getParameter("introducedDate")));
+			computer.setDiscontinued(parser.parse(request.getParameter("discontinuedDate")));
+		
+			Company company = myCompanyDAO.getCompanyById(Integer.parseInt(request.getParameter("company")));
+			computer.setCompany(company);
 			
-			dao.addComputer(computer);
-			List<Computer> computerList = dao.getComputerList();
+			myComputerDAO.addComputer(computer);
+			request.setAttribute("companyList", myCompanyDAO.getCompanyList());			
+			request.getRequestDispatcher("addComputer.jsp").forward(request, response);;
 			
-			response.setContentType("text/html");
-			PrintWriter pw = response.getWriter();
-			
-			pw.print("<html><head><title>Liste des ordinateurs</title></head><body>");
-			pw.println("<table>");
-			
-			Iterator<Computer> it = computerList.iterator();
-			while(it.hasNext()){
-				
-				Computer c = (Computer) it.next();
-				pw.println("<tr>");
-				pw.println("<td>" + c.getId() + "</td>");
-				pw.println("<td>" + c.getName() + "</td>");
-				pw.println("<td>" + c.getIntroduced() + "</td>");
-				pw.println("<td>" + c.getDiscontinued() + "</td>");
-				pw.println("<td>" + c.getCompany_id() + "</td>");
-				pw.println("</tr>");
-			}
-			
-			pw.println("</table>");
-			pw.println("</body></html>");
-			pw.close();
-			
-		} catch (SQLException e) {
+		} catch (SQLException | ParseException e) {
 			e.printStackTrace();
+			request.getRequestDispatcher("addComputer.jsp").forward(request, response);
 		}
 	}
 }
