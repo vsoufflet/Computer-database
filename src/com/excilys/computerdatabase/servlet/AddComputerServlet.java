@@ -2,10 +2,8 @@ package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,32 +16,43 @@ import com.excilys.computerdatabase.persistence.CompanyDAO;
 import com.excilys.computerdatabase.persistence.ComputerDAO;
 
 @WebServlet("/AddComputerServlet")
-public class AddComputerServlet extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet{
+public class AddComputerServlet extends javax.servlet.http.HttpServlet
+		implements javax.servlet.Servlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
 	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
+
 	public AddComputerServlet() {
 		super();
 	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
+
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
 		try {
 			SimpleDateFormat parser = new SimpleDateFormat("YYYY-MM-dd");
-			
+
 			Computer computer = new Computer();
 			computer.setName(request.getParameter("name"));
-			computer.setIntroduced(parser.parse(request.getParameter("introducedDate")));
-			computer.setDiscontinued(parser.parse(request.getParameter("discontinuedDate")));
-		
-			Company company = myCompanyDAO.getCompanyById(Integer.parseInt(request.getParameter("company")));
+			computer.setIntroduced(parser.parse(request
+					.getParameter("introducedDate")));
+			computer.setDiscontinued(parser.parse(request
+					.getParameter("discontinuedDate")));
+
+			Company company = myCompanyDAO.getCompanyById(Integer
+					.parseInt(request.getParameter("company")));
 			computer.setCompany(company);
-			
+
 			myComputerDAO.addComputer(computer);
-			request.setAttribute("companyList", myCompanyDAO.getCompanyList());			
-			request.getRequestDispatcher("addComputer.jsp").forward(request, response);;
-			
+			request.getRequestDispatcher("addComputer.jsp").forward(request,
+					response);
+
 		} catch (SQLException | ParseException e) {
 			e.printStackTrace();
-			request.getRequestDispatcher("addComputer.jsp").forward(request, response);
+			request.getRequestDispatcher("addComputer.jsp").forward(request,
+					response);
 		}
 	}
 }

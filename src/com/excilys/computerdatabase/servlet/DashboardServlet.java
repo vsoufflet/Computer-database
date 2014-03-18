@@ -2,6 +2,7 @@ package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.persistence.CompanyDAO;
 import com.excilys.computerdatabase.persistence.ComputerDAO;
 
 /**
@@ -19,45 +21,60 @@ import com.excilys.computerdatabase.persistence.ComputerDAO;
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    ComputerDAO myComputerDAO = ComputerDAO.getInstance();
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public DashboardServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
+	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
 
 	/**
-	 * @throws IOException 
-	 * @throws ServletException 
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
-		List<Computer> computerList;
+	public DashboardServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @throws IOException
+	 * @throws ServletException
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException {
+		List<Computer> computerList = new ArrayList<Computer>();
 		try {
+			String searchBy = request.getParameter("searchBy");
 			String search = request.getParameter("search");
-			
-			if(search!=null){
-					computerList = myComputerDAO.filterByName(search);
-					request.setAttribute("computerList", computerList);
-			}
-			else{
-				computerList = myComputerDAO.getComputerList();
+			String orderBy = request.getParameter("orderBy");
+			String way = request.getParameter("way");
+
+			if (searchBy.equalsIgnoreCase("computer")) {
+				computerList = myComputerDAO.getList(search, orderBy, way);
+				request.setAttribute("computerList", computerList);
+
+			} else if (searchBy.equalsIgnoreCase("company")) {
+				computerList = myCompanyDAO.getComputerListByCompany(search,
+						orderBy, way);
 				request.setAttribute("computerList", computerList);
 			}
-			if(computerList.size()<=1){
-				request.setAttribute("NombreOrdinateurs", computerList.size()+" computer found");
+
+			else {
+				computerList = myComputerDAO.getList(search, orderBy, way);
+				request.setAttribute("computerList", computerList);
 			}
-			else{
-				request.setAttribute("NombreOrdinateurs", computerList.size()+" computers found");
+
+			if (computerList.size() <= 1) {
+				request.setAttribute("NombreOrdinateurs", computerList.size()
+						+ " computer found");
+			} else {
+				request.setAttribute("NombreOrdinateurs", computerList.size()
+						+ " computers found");
 			}
-			
-			request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+
+			request.getRequestDispatcher("dashboard.jsp").forward(request,
+					response);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 }
-

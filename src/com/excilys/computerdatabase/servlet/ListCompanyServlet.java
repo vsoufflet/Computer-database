@@ -10,43 +10,37 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.persistence.ComputerDAO;
+import com.excilys.computerdatabase.domain.Company;
+import com.excilys.computerdatabase.persistence.CompanyDAO;
 
 /**
- * Servlet implementation class DeleteComputerServlet
+ * Servlet implementation class ListCompany
  */
-@WebServlet("/DeleteComputerServlet")
-public class DeleteComputerServlet extends HttpServlet {
+@WebServlet("/ListCompanyServlet")
+public class ListCompanyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
+	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DeleteComputerServlet() {
+	public ListCompanyServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-
 		try {
-			Computer computer = myComputerDAO.getComputerByName(request
-					.getParameter("name"));
-			myComputerDAO.deleteComputer(computer);
-			List<Computer> computerList = myComputerDAO.getList(null, null,
-					null);
+			List<Company> companyList = myCompanyDAO.getCompanyList();
 
-			request.setAttribute("computerList", computerList);
-			request.getRequestDispatcher("DashboardServlet").forward(request,
+			request.setAttribute("companyList", companyList);
+			request.getRequestDispatcher("addComputer.jsp").forward(request,
 					response);
-
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -4,76 +4,65 @@ import java.util.Date;
 
 public class Computer {
 
-	int id;
-	String name;
-	Date introduced;
-	Date discontinued;
-	Company company;
+	private int id;
+	private String name;
+	private Date introduced;
+	private Date discontinued;
+	private Company company;
 
 	public Computer() {
 	}
-
 
 	public int getId() {
 		return id;
 	}
 
-
 	public void setId(int id) {
 		this.id = id;
 	}
-
 
 	public String getName() {
 		return name;
 	}
 
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
 
 	public Date getIntroduced() {
 		return introduced;
 	}
 
-
 	public void setIntroduced(Date introduced) {
 		this.introduced = introduced;
 	}
-
 
 	public Date getDiscontinued() {
 		return discontinued;
 	}
 
-
 	public void setDiscontinued(Date discontinued) {
 		this.discontinued = discontinued;
 	}
-
 
 	public Company getCompany() {
 		return company;
 	}
 
-
 	public void setCompany(Company company) {
 		this.company = company;
 	}
 
-	
 	@Override
 	public String toString() {
-		return "Computer Name: "+name+" + id: + "+id+" Introduced Date: "+introduced+
-				" Discontinued Date: "+discontinued+" Company: "+company;
+		return "Computer Name: " + name + " + id: + " + id
+				+ " Introduced Date: " + introduced + " Discontinued Date: "
+				+ discontinued + " Company: " + company;
 	}
-
 
 	@Override
 	public int hashCode() {
-		final int prime =31;
+		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((company == null) ? 0 : company.hashCode());
 		result = prime * result
@@ -84,7 +73,6 @@ public class Computer {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -119,7 +107,5 @@ public class Computer {
 			return false;
 		return true;
 	}
-	
-	
 
 }

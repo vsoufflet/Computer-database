@@ -6,10 +6,28 @@
 	<div id="actions">
 		<form action="DashboardServlet" method="GET">
 			<input type="search" id="searchbox" name="search"
-				placeholder="Search name"> <a class="btn primary"
-				id="searchsubmit" href="DashboardServlet">Filter by name</a>
+				placeholder="Search name"> 
+				
+		<select name="searchBy">
+		<option SELECTED value="default">Search By</option>
+		<option value="computer">Computer Name</option>
+		<option value="company">Company Name</option>
+		</select>
+		
+		<select name="orderBy">
+			<option SELECTED value="default">Order By</option>
+			<option value="id">Computer Id</option>
+			<option value="name">Computer Name</option>
+			<option value="introduced">Introduced</option>
+			<option value="discontinued">Discontinued</option>
+			<option value="company.id">Company Id</option>
+			<option value="company.name">Company Name</option>
+		</select>
+				<input type="submit" class="btn primary"
+				id="searchsubmit" value="Filter by name"></input>
 		</form>
-		<a class="btn success" id="add" href="addComputer.jsp">Add
+		
+		<a class="btn success" id="add" href="/Computer-database/ListCompanyServlet">Add
 			Computer</a>
 	</div>
 
@@ -37,7 +55,7 @@
 					<td>${entry.discontinued}</td>
 					<td>${entry.company.name}</td>
 					<td><a class="btn danger" id="Delete"
-						href="DeleteComputerServlet">Delete Computer</a></td>
+						href="DeleteComputerServlet?name=${entry.name}">Delete Computer</a></td>
 				</tr>
 			</c:forEach>
 

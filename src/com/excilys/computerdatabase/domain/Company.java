@@ -2,9 +2,15 @@ package com.excilys.computerdatabase.domain;
 
 public class Company {
 
-	int id;
-	String name;
-	
+	private int id;
+	private String name;
+
+	public Company(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
 	public Company() {
 		super();
 	}
@@ -25,15 +31,14 @@ public class Company {
 		this.name = name;
 	}
 
-	
 	@Override
 	public String toString() {
-		return "Company Name: "+name+"id: "+id;
+		return "Company Name: " + name + "id: " + id;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime =31;
+		final int prime = 31;
 		int result = 1;
 		result = prime * result + id;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -58,6 +63,5 @@ public class Company {
 			return false;
 		return true;
 	}
-	
-	
+
 }

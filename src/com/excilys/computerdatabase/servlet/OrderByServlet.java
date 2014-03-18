@@ -2,6 +2,8 @@ package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,17 +15,17 @@ import com.excilys.computerdatabase.domain.Computer;
 import com.excilys.computerdatabase.persistence.ComputerDAO;
 
 /**
- * Servlet implementation class EditComputerServlet
+ * Servlet implementation class OrderByServlet
  */
-@WebServlet("/EditComputerServlet")
-public class EditComputerServlet extends HttpServlet {
+@WebServlet("/OrderByServlet")
+public class OrderByServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public EditComputerServlet() {
+	public OrderByServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -34,32 +36,21 @@ public class EditComputerServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-
 		try {
-			Computer computer = myComputerDAO.getComputerByName(request
-					.getParameter("name"));
+			List<Computer> computerList = new ArrayList<Computer>();
+			String orderBy = request.getParameter("orderBy");
+			String way = request.getParameter("way");
 
-			request.setAttribute("computer", computer);
-			if (computer.getName() != null) {
-				request.setAttribute("name", computer.getName());
-			}
-			if (computer.getIntroduced() != null) {
-				request.setAttribute("introduced", computer.getIntroduced());
-			}
-			if (computer.getDiscontinued() != null) {
-				request.setAttribute("discontinued", computer.getDiscontinued());
-			}
-			if (computer.getCompany() != null) {
-				request.setAttribute("companyId", computer.getCompany().getId());
-				request.setAttribute("companyName", computer.getCompany()
-						.getName());
-			}
-			request.getRequestDispatcher("editComputer.jsp").forward(request,
+			computerList = myComputerDAO.getList(orderBy, way);
+
+			request.setAttribute("computerList", computerList);
+			request.getRequestDispatcher("dasboard.jsp").forward(request,
 					response);
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 }

@@ -33,7 +33,7 @@
 				<label for="company">Company Name:</label>
 				<div class="input">
 					<select name="company" class="form-control select-form">
-						<option value="0">--</option>
+						<option value="default">--</option>
 						<c:forEach var="entry" items="${companyList}">
 							<option value="${entry.id}">${entry.name}</option>
 						</c:forEach>
