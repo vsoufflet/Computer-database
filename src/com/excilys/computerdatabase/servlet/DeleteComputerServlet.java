@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.persistence.ComputerDAO;
+import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 /**
  * Servlet implementation class DeleteComputerServlet
@@ -19,7 +19,7 @@ import com.excilys.computerdatabase.persistence.ComputerDAO;
 @WebServlet("/DeleteComputerServlet")
 public class DeleteComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
+	ComputerServiceImpl computerService = new ComputerServiceImpl();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -37,11 +37,11 @@ public class DeleteComputerServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		try {
-			Computer computer = myComputerDAO.getComputerByName(request
+			Computer computer = computerService.retrieveByName(request
 					.getParameter("name"));
-			myComputerDAO.deleteComputer(computer);
-			List<Computer> computerList = myComputerDAO.getList(null, null,
-					null);
+			computerService.delete(computer);
+			List<Computer> computerList = computerService.retrieveList(null,
+					"default", null);
 
 			request.setAttribute("computerList", computerList);
 			request.getRequestDispatcher("DashboardServlet").forward(request,
@@ -52,5 +52,4 @@ public class DeleteComputerServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-
 }

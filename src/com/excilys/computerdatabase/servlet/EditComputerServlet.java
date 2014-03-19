@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.persistence.ComputerDAO;
+import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 /**
  * Servlet implementation class EditComputerServlet
@@ -18,7 +18,7 @@ import com.excilys.computerdatabase.persistence.ComputerDAO;
 @WebServlet("/EditComputerServlet")
 public class EditComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
+	ComputerServiceImpl computerService = new ComputerServiceImpl();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -36,7 +36,7 @@ public class EditComputerServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		try {
-			Computer computer = myComputerDAO.getComputerByName(request
+			Computer computer = computerService.retrieveByName(request
 					.getParameter("name"));
 
 			request.setAttribute("computer", computer);

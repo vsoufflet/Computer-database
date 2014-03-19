@@ -1,5 +1,6 @@
 package com.excilys.computerdatabase.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,11 +10,14 @@ import java.util.List;
 
 import com.excilys.computerdatabase.domain.Company;
 import com.excilys.computerdatabase.domain.Computer;
-import com.mysql.jdbc.Connection;
+import com.excilys.computerdatabase.service.CompanyServiceImpl;
+import com.jolbox.bonecp.BoneCP;
 
 public class ComputerDAO {
-	ConnectionManager cm = new ConnectionManager();
-	CompanyDAO cDAO = CompanyDAO.getInstance();
+	ConnectionManager cm = ConnectionManager.getInstance();
+	DAOFactory df = DAOFactory.getInstance();
+	BoneCP connectionPool;
+	CompanyServiceImpl companyService = new CompanyServiceImpl();
 
 	private static ComputerDAO myDAO = new ComputerDAO();;
 
@@ -32,7 +36,13 @@ public class ComputerDAO {
 
 		String query = "INSERT into computer (id,name,introduced,discontinued,company_id) VALUES(?,?,?,?,?)";
 
-		conn = cm.getConnection();
+		// conn = cm.getConnection();
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
+			conn = connectionPool.getConnection();
+		} else {
+			conn = connectionPool.getConnection();
+		}
 		ps = conn.prepareStatement(query);
 
 		ps.setInt(1, c.getId());
@@ -54,7 +64,14 @@ public class ComputerDAO {
 		String query = "SELECT * FROM computer WHERE name=?";
 		ResultSet rs = null;
 		Computer computer = new Computer();
-		conn = cm.getConnection();
+
+		// conn = cm.getConnection();
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
+			conn = connectionPool.getConnection();
+		} else {
+			conn = connectionPool.getConnection();
+		}
 		ps = conn.prepareStatement(query);
 		ps.setString(1, name);
 		rs = ps.executeQuery();
@@ -64,7 +81,7 @@ public class ComputerDAO {
 		computer.setName(rs.getString(2));
 		computer.setIntroduced(rs.getDate(3));
 		computer.setDiscontinued(rs.getDate(4));
-		computer.setCompany(cDAO.getCompanyById(rs.getInt(5)));
+		computer.setCompany(companyService.retrieveById(rs.getInt(5)));
 
 		rs.close();
 		ps.close();
@@ -72,83 +89,18 @@ public class ComputerDAO {
 		return computer;
 	}
 
-	/*
-	 * public List<Computer> getComputerList() throws SQLException {
-	 * 
-	 * Connection conn = null; Statement stmt = null; String query =
-	 * "SELECT * FROM computer"; ResultSet rs = null; List<Computer>
-	 * computerList = new ArrayList<Computer>();
-	 * 
-	 * conn = cm.getConnection(); stmt = (Statement) conn.createStatement(); rs
-	 * = stmt.executeQuery(query);
-	 * 
-	 * while (rs.next()) {
-	 * 
-	 * Computer computer = new Computer(); computer.setId(rs.getInt(1));
-	 * computer.setName(rs.getString(2)); computer.setIntroduced(rs.getDate(3));
-	 * computer.setDiscontinued(rs.getDate(4));
-	 * 
-	 * Company company = cDAO.getCompanyById(rs.getInt(5));
-	 * computer.setCompany(company);
-	 * 
-	 * computerList.add(computer); } rs.close(); stmt.close(); conn.close();
-	 * 
-	 * return computerList; }
-	 * 
-	 * public List<Computer> getSortedList(String orderBy, String way) throws
-	 * SQLException {
-	 * 
-	 * List<Computer> computerList = new ArrayList<Computer>(); Connection conn
-	 * = null; PreparedStatement ps = null; String query = null;
-	 * 
-	 * if (way != null) { query = "SELECT * FROM computer ORDER BY " + orderBy +
-	 * " " + way;
-	 * 
-	 * } else { query = "SELECT * FROM computer ORDER BY " + orderBy; } conn =
-	 * cm.getConnection(); ps = conn.prepareStatement(query);
-	 * 
-	 * ResultSet rs = ps.executeQuery(); while (rs.next()) {
-	 * 
-	 * Computer computer = new Computer(); computer.setId(rs.getInt(1));
-	 * computer.setName(rs.getString(2)); computer.setIntroduced(rs.getDate(3));
-	 * computer.setDiscontinued(rs.getDate(4));
-	 * 
-	 * Company company = cDAO.getCompanyById(rs.getInt(5));
-	 * computer.setCompany(company);
-	 * 
-	 * computerList.add(computer); } rs.close(); ps.close(); conn.close();
-	 * 
-	 * return computerList; }
-	 * 
-	 * public List<Computer> filterByName(String name) throws SQLException {
-	 * 
-	 * List<Computer> computerList = new ArrayList<Computer>(); Connection conn
-	 * = null; PreparedStatement ps = null; ResultSet rs = null; String query =
-	 * "SELECT * FROM computer WHERE name LIKE ?";
-	 * 
-	 * conn = cm.getConnection(); ps = conn.prepareStatement(query);
-	 * ps.setString(1, "%" + name + "%"); rs = ps.executeQuery();
-	 * 
-	 * while (rs.next()) { Computer computer = new Computer();
-	 * computer.setId(rs.getInt(1)); computer.setName(rs.getString(2));
-	 * computer.setIntroduced(rs.getDate(3));
-	 * computer.setDiscontinued(rs.getDate(4));
-	 * 
-	 * Company company = cDAO.getCompanyById(rs.getInt(5));
-	 * computer.setCompany(company);
-	 * 
-	 * computerList.add(computer); }
-	 * 
-	 * rs.close(); ps.close(); conn.close();
-	 * 
-	 * return computerList; }
-	 */
-
 	public void deleteComputer(Computer c) throws SQLException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		String query = "DELETE from computer WHERE id=?";
-		conn = cm.getConnection();
+
+		// conn = cm.getConnection();
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
+			conn = connectionPool.getConnection();
+		} else {
+			conn = connectionPool.getConnection();
+		}
 		ps = conn.prepareStatement(query);
 		ps.setInt(1, c.getId());
 
@@ -168,7 +120,7 @@ public class ComputerDAO {
 		ResultSet rs = null;
 
 		if (search != null && search != "") {
-			if (!"default".equalsIgnoreCase(orderBy)) {
+			if (!orderBy.equalsIgnoreCase("default")) {
 				if (way != null) {
 					query = "SELECT * FROM computer WHERE name LIKE ? ORDER BY "
 							+ orderBy + " " + way;
@@ -179,11 +131,17 @@ public class ComputerDAO {
 			} else {
 				query = "SELECT * FROM computer WHERE name LIKE ?";
 			}
-			conn = cm.getConnection();
+			// conn = cm.getConnection();
+			if (connectionPool == null) {
+				connectionPool = df.initialise();
+				conn = connectionPool.getConnection();
+			} else {
+				conn = connectionPool.getConnection();
+			}
 			ps = conn.prepareStatement(query);
 			ps.setString(1, "%" + search + "%");
 		} else {
-			if (!"default".equalsIgnoreCase(orderBy)) {
+			if (!orderBy.equalsIgnoreCase("default")) {
 				if (way != null) {
 					query = "SELECT * FROM computer ORDER BY " + orderBy + " "
 							+ way;
@@ -193,9 +151,16 @@ public class ComputerDAO {
 			} else {
 				query = "SELECT * FROM computer";
 			}
-			conn = cm.getConnection();
+			// conn = cm.getConnection();
+			if (connectionPool == null) {
+				connectionPool = df.initialise();
+				conn = connectionPool.getConnection();
+			} else {
+				conn = connectionPool.getConnection();
+			}
 			ps = conn.prepareStatement(query);
 		}
+
 		rs = ps.executeQuery();
 
 		while (rs.next()) {
@@ -205,10 +170,85 @@ public class ComputerDAO {
 			computer.setIntroduced(rs.getDate(3));
 			computer.setDiscontinued(rs.getDate(4));
 
-			Company company = cDAO.getCompanyById(rs.getInt(5));
+			Company company = companyService.retrieveById(rs.getInt(5));
 			computer.setCompany(company);
 
 			computerList.add(computer);
+		}
+
+		rs.close();
+		ps.close();
+		conn.close();
+
+		return computerList;
+	}
+
+	public List<Computer> getListByCompany(String search, String orderBy,
+			String way) throws SQLException {
+
+		List<Computer> computerList = new ArrayList<Computer>();
+		Connection conn = null;
+		PreparedStatement ps = null;
+		String query = null;
+		ResultSet rs = null;
+
+		if (search != null && search != "") {
+			if (!orderBy.equalsIgnoreCase("default")) {
+				if (way != null) {
+					query = "SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ? ORDER BY "
+							+ orderBy + " " + way;
+				} else {
+					query = "SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ? ORDER BY "
+							+ orderBy;
+				}
+			} else {
+				query = "SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ?";
+			}
+			// conn = cm.getConnection();
+			if (connectionPool == null) {
+				connectionPool = df.initialise();
+				conn = connectionPool.getConnection();
+			} else {
+				conn = connectionPool.getConnection();
+			}
+			ps = conn.prepareStatement(query);
+			ps.setString(1, "%" + search + "%");
+		} else {
+			if (!orderBy.equalsIgnoreCase("default")) {
+				if (way != null) {
+					query = "SELECT * FROM computer ORDER BY " + orderBy + " "
+							+ way;
+				} else {
+					query = "SELECT * FROM computer ORDER BY " + orderBy;
+				}
+			} else {
+				query = "SELECT * FROM computer";
+			}
+			// conn = cm.getConnection();
+			if (connectionPool == null) {
+				connectionPool = df.initialise();
+				conn = connectionPool.getConnection();
+			} else {
+				conn = connectionPool.getConnection();
+			}
+			ps = conn.prepareStatement(query);
+		}
+
+		System.out.println(query);
+		rs = ps.executeQuery();
+
+		while (rs.next()) {
+			Computer computer = new Computer();
+			computer.setId(rs.getInt(1));
+			computer.setName(rs.getString(2));
+			computer.setIntroduced(rs.getDate(3));
+			computer.setDiscontinued(rs.getDate(4));
+
+			Company company = companyService.retrieveById(rs.getInt(5));
+			computer.setCompany(company);
+
+			computerList.add(computer);
+			System.out.println(computer.toString());
 		}
 
 		rs.close();

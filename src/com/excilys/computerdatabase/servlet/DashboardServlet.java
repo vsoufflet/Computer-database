@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.persistence.CompanyDAO;
-import com.excilys.computerdatabase.persistence.ComputerDAO;
+import com.excilys.computerdatabase.service.CompanyServiceImpl;
+import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 /**
  * Servlet implementation class DashboardServlet
@@ -21,8 +21,8 @@ import com.excilys.computerdatabase.persistence.ComputerDAO;
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
-	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
+	ComputerServiceImpl computerService = new ComputerServiceImpl();
+	CompanyServiceImpl companyService = new CompanyServiceImpl();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -42,32 +42,45 @@ public class DashboardServlet extends HttpServlet {
 			HttpServletResponse response) throws IOException, ServletException {
 		List<Computer> computerList = new ArrayList<Computer>();
 		try {
-			String searchBy = request.getParameter("searchBy");
+			String searchBy = request.getParameter("searchBy") == null ? "default"
+					: request.getParameter("searchBy");
 			String search = request.getParameter("search");
-			String orderBy = request.getParameter("orderBy");
+			String orderBy = request.getParameter("orderBy") == null ? "default"
+					: request.getParameter("orderBy");
 			String way = request.getParameter("way");
 
+			System.out.println(search + " " + searchBy + " " + orderBy);
+
 			if (searchBy.equalsIgnoreCase("computer")) {
-				computerList = myComputerDAO.getList(search, orderBy, way);
-				request.setAttribute("computerList", computerList);
-
+				if (!orderBy.equalsIgnoreCase("company.id")
+						&& !orderBy.equalsIgnoreCase("company.name")) {
+					computerList = computerService.retrieveList(search,
+							orderBy, way);
+				} else {
+					computerList = computerService.retrieveListByCompany(
+							search, orderBy, way);
+				}
 			} else if (searchBy.equalsIgnoreCase("company")) {
-				computerList = myCompanyDAO.getComputerListByCompany(search,
+				computerList = computerService.retrieveListByCompany(search,
 						orderBy, way);
-				request.setAttribute("computerList", computerList);
+			} else {
+				if (!orderBy.equalsIgnoreCase("company.id")
+						&& !orderBy.equalsIgnoreCase("company.name")) {
+					computerList = computerService.retrieveList(search,
+							orderBy, way);
+				} else {
+					computerList = computerService.retrieveListByCompany(
+							search, orderBy, way);
+				}
 			}
-
-			else {
-				computerList = myComputerDAO.getList(search, orderBy, way);
-				request.setAttribute("computerList", computerList);
-			}
+			request.setAttribute("computerList", computerList);
 
 			if (computerList.size() <= 1) {
 				request.setAttribute("NombreOrdinateurs", computerList.size()
 						+ " computer found");
 			} else {
 				request.setAttribute("NombreOrdinateurs", computerList.size()
-						+ " computers found");
+						+ " computerService found");
 			}
 
 			request.getRequestDispatcher("dashboard.jsp").forward(request,

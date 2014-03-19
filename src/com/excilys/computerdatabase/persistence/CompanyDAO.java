@@ -1,5 +1,6 @@
 package com.excilys.computerdatabase.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,14 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.excilys.computerdatabase.domain.Company;
-import com.excilys.computerdatabase.domain.Computer;
-import com.mysql.jdbc.Connection;
+import com.jolbox.bonecp.BoneCP;
 
 public class CompanyDAO {
 
-	ConnectionManager cm = new ConnectionManager();
+	ConnectionManager cm = ConnectionManager.getInstance();
+	DAOFactory df = DAOFactory.getInstance();
+	BoneCP connectionPool;
 
-	private static CompanyDAO myDAO = new CompanyDAO();;
+	private static CompanyDAO myDAO = new CompanyDAO();
 
 	private CompanyDAO() {
 
@@ -28,10 +30,17 @@ public class CompanyDAO {
 	public void addCompany(Company c) throws SQLException {
 
 		Connection conn = null;
+
 		PreparedStatement ps = null;
 		String query = "INSERT into computer (id,name,introduced,discontinued,company_id) VALUES(?,?,?,?,?)";
 
-		conn = cm.getConnection();
+		// conn = cm.getConnection();
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
+			conn = connectionPool.getConnection();
+		} else {
+			conn = connectionPool.getConnection();
+		}
 		ps = conn.prepareStatement(query);
 
 		ps.setInt(1, c.getId());
@@ -63,7 +72,13 @@ public class CompanyDAO {
 		ResultSet rs = null;
 		List<Company> companyList = new ArrayList<Company>();
 
-		conn = cm.getConnection();
+		// conn = cm.getConnection();
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
+			conn = connectionPool.getConnection();
+		} else {
+			conn = connectionPool.getConnection();
+		}
 		stmt = (Statement) conn.createStatement();
 		rs = stmt.executeQuery(query);
 
@@ -107,65 +122,4 @@ public class CompanyDAO {
 	 * 
 	 * return computerList; }
 	 */
-
-	public List<Computer> getComputerListByCompany(String search,
-			String orderBy, String way) throws SQLException {
-
-		List<Computer> computerList = new ArrayList<Computer>();
-		Connection conn = null;
-		PreparedStatement ps = null;
-		String query = null;
-		ResultSet rs = null;
-
-		if (search != null && search != "") {
-			if (orderBy != "default") {
-				if (way != null) {
-					query = "SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ? ORDER BY "
-							+ orderBy + " " + way;
-				} else {
-					query = "SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ? ORDER BY "
-							+ orderBy;
-				}
-			} else {
-				query = "SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ?";
-			}
-			conn = cm.getConnection();
-			ps = conn.prepareStatement(query);
-			ps.setString(1, "%" + search + "%");
-		} else {
-			if (orderBy != "default") {
-				if (way != null) {
-					query = "SELECT * FROM computer ORDER BY " + orderBy + " "
-							+ way;
-				} else {
-					query = "SELECT * FROM computer ORDER BY " + orderBy;
-				}
-			} else {
-				query = "SELECT * FROM computer";
-			}
-			conn = cm.getConnection();
-			ps = conn.prepareStatement(query);
-		}
-
-		rs = ps.executeQuery();
-
-		while (rs.next()) {
-			Computer computer = new Computer();
-			computer.setId(rs.getInt(1));
-			computer.setName(rs.getString(2));
-			computer.setIntroduced(rs.getDate(3));
-			computer.setDiscontinued(rs.getDate(4));
-
-			Company company = myDAO.getCompanyById(rs.getInt(5));
-			computer.setCompany(company);
-
-			computerList.add(computer);
-		}
-
-		rs.close();
-		ps.close();
-		conn.close();
-
-		return computerList;
-	}
 }

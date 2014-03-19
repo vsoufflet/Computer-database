@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Company;
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.persistence.CompanyDAO;
-import com.excilys.computerdatabase.persistence.ComputerDAO;
+import com.excilys.computerdatabase.service.CompanyServiceImpl;
+import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 @WebServlet("/AddComputerServlet")
 public class AddComputerServlet extends javax.servlet.http.HttpServlet
@@ -22,8 +22,8 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
-	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
+	ComputerServiceImpl computerService = new ComputerServiceImpl();
+	CompanyServiceImpl companyService = new CompanyServiceImpl();;
 
 	public AddComputerServlet() {
 		super();
@@ -41,11 +41,11 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 			computer.setDiscontinued(parser.parse(request
 					.getParameter("discontinuedDate")));
 
-			Company company = myCompanyDAO.getCompanyById(Integer
+			Company company = companyService.retrieveById(Integer
 					.parseInt(request.getParameter("company")));
 			computer.setCompany(company);
 
-			myComputerDAO.addComputer(computer);
+			computerService.create(computer);
 			request.getRequestDispatcher("addComputer.jsp").forward(request,
 					response);
 

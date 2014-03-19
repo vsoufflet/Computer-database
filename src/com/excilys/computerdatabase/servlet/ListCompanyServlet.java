@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Company;
-import com.excilys.computerdatabase.persistence.CompanyDAO;
+import com.excilys.computerdatabase.service.CompanyServiceImpl;
 
 /**
  * Servlet implementation class ListCompany
@@ -19,7 +19,7 @@ import com.excilys.computerdatabase.persistence.CompanyDAO;
 @WebServlet("/ListCompanyServlet")
 public class ListCompanyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
+	CompanyServiceImpl companyService = new CompanyServiceImpl();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -36,7 +36,7 @@ public class ListCompanyServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		try {
-			List<Company> companyList = myCompanyDAO.getCompanyList();
+			List<Company> companyList = companyService.retrieveList();
 
 			request.setAttribute("companyList", companyList);
 			request.getRequestDispatcher("addComputer.jsp").forward(request,
@@ -46,5 +46,4 @@ public class ListCompanyServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-
 }
