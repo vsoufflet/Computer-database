@@ -13,18 +13,18 @@ public class CompanyServiceImpl implements CompanyServiceInterface {
 
 	@Override
 	public void create(Company c) throws SQLException {
-		myCompanyDAO.addCompany(c);
+		myCompanyDAO.create(c);
 	}
 
 	@Override
-	public Company retrieveById(int id) throws SQLException {
-		Company company = myCompanyDAO.getCompanyById(id);
+	public Company retrieveById(Long id) throws SQLException {
+		Company company = myCompanyDAO.retrieveById(id);
 		return company;
 	}
 
 	@Override
 	public List<Company> retrieveList() throws SQLException {
-		List<Company> companyList = myCompanyDAO.getCompanyList();
+		List<Company> companyList = myCompanyDAO.retrieveList();
 		return companyList;
 	}
 }

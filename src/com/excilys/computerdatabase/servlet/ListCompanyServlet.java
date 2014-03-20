@@ -26,7 +26,6 @@ public class ListCompanyServlet extends HttpServlet {
 	 */
 	public ListCompanyServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -39,10 +38,12 @@ public class ListCompanyServlet extends HttpServlet {
 			List<Company> companyList = companyService.retrieveList();
 
 			request.setAttribute("companyList", companyList);
-			request.getRequestDispatcher("addComputer.jsp").forward(request,
-					response);
+			request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
+					request, response);
+
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			System.err
+					.println("Erreur lors de la connection: ListCompanyServlet");
 			e.printStackTrace();
 		}
 	}

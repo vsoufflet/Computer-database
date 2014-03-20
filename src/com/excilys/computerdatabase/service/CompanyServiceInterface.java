@@ -9,7 +9,7 @@ public interface CompanyServiceInterface {
 
 	public void create(Company c) throws SQLException;
 
-	public Company retrieveById(int id) throws SQLException;
+	public Company retrieveById(Long id) throws SQLException;
 
 	public List<Company> retrieveList() throws SQLException;
 

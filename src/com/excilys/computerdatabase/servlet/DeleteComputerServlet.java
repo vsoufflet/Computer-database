@@ -2,7 +2,6 @@ package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 /**
@@ -20,13 +20,13 @@ import com.excilys.computerdatabase.service.ComputerServiceImpl;
 public class DeleteComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ComputerServiceImpl computerService = new ComputerServiceImpl();
+	PageWrapper pw = new PageWrapper();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public DeleteComputerServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -36,19 +36,24 @@ public class DeleteComputerServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
+		pw = PageWrapper.builder().search("default").orderBy("default")
+				.way("default").build();
 		try {
-			Computer computer = computerService.retrieveByName(request
-					.getParameter("name"));
-			computerService.delete(computer);
-			List<Computer> computerList = computerService.retrieveList(null,
-					"default", null);
+			String name = request.getParameter("name");
 
-			request.setAttribute("computerList", computerList);
+			Computer computer = computerService.retrieveByName(name);
+			computerService.delete(computer);
+
+			pw = PageWrapper.builder()
+					.computerList(computerService.retrieveList(pw)).build();
+
+			request.setAttribute("PageWrapper", pw);
 			request.getRequestDispatcher("DashboardServlet").forward(request,
 					response);
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			System.err
+					.println("Erreur lors de la connection: DeleteConnectionServlet");
 			e.printStackTrace();
 		}
 	}

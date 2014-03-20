@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,27 +33,35 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 		try {
+
 			SimpleDateFormat parser = new SimpleDateFormat("YYYY-MM-dd");
 
-			Computer computer = new Computer();
-			computer.setName(request.getParameter("name"));
-			computer.setIntroduced(parser.parse(request
-					.getParameter("introducedDate")));
-			computer.setDiscontinued(parser.parse(request
-					.getParameter("discontinuedDate")));
+			String name = request.getParameter("name");
+			Date introduced = parser.parse(request
+					.getParameter("introducedDate"));
+			Date discontinued = parser.parse(request
+					.getParameter("discontinuedDate"));
+			Long companyId = Long.parseLong(request.getParameter("company"));
 
-			Company company = companyService.retrieveById(Integer
-					.parseInt(request.getParameter("company")));
+			Computer computer = new Computer();
+			computer.setName(name);
+			computer.setIntroduced(introduced);
+			computer.setDiscontinued(discontinued);
+			Company company = companyService.retrieveById(companyId);
 			computer.setCompany(company);
 
 			computerService.create(computer);
-			request.getRequestDispatcher("addComputer.jsp").forward(request,
-					response);
+			request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
+					request, response);
 
-		} catch (SQLException | ParseException e) {
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur lors de la connection: AddComputerServlet");
 			e.printStackTrace();
-			request.getRequestDispatcher("addComputer.jsp").forward(request,
-					response);
+		} catch (ParseException e) {
+			System.err.println("Erreur lors du parse de la date.");
+			e.printStackTrace();
+			response.sendRedirect("WEB-INF/addComputer.jsp");
 		}
 	}
 }

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.persistence.ComputerDAO;
 
 public class ComputerServiceImpl implements ComputerServiceInterface {
@@ -13,35 +14,31 @@ public class ComputerServiceImpl implements ComputerServiceInterface {
 
 	@Override
 	public void create(Computer c) throws SQLException {
-		myComputerDAO.addComputer(c);
+		myComputerDAO.create(c);
 	}
 
 	@Override
 	public Computer retrieveByName(String name) throws SQLException {
-		Computer computer = myComputerDAO.getComputerByName(name);
+		Computer computer = myComputerDAO.retrieveByName(name);
 		return computer;
 	}
 
 	@Override
-	public List<Computer> retrieveList(String search, String orderBy, String way)
-			throws SQLException {
-		List<Computer> computerList = myComputerDAO.getList(search, orderBy,
-				way);
+	public List<Computer> retrieveList(PageWrapper pw) throws SQLException {
+		List<Computer> computerList = myComputerDAO.retrieveAll(pw);
 		return computerList;
 	}
 
 	@Override
-	public List<Computer> retrieveListByCompany(String search, String orderBy,
-			String way) throws SQLException {
-		List<Computer> computerList = myComputerDAO.getListByCompany(search,
-				orderBy, way);
+	public List<Computer> retrieveListByCompany(PageWrapper pw)
+			throws SQLException {
+		List<Computer> computerList = myComputerDAO.retrieveAllByCompany(pw);
 		return computerList;
 	}
 
 	@Override
 	public void delete(Computer c) throws SQLException {
-		myComputerDAO.deleteComputer(c);
+		myComputerDAO.delete(c);
 
 	}
-
 }

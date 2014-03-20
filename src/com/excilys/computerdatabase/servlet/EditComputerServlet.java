@@ -25,7 +25,6 @@ public class EditComputerServlet extends HttpServlet {
 	 */
 	public EditComputerServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -36,8 +35,9 @@ public class EditComputerServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		try {
-			Computer computer = computerService.retrieveByName(request
-					.getParameter("name"));
+			String name = request.getParameter("name");
+
+			Computer computer = computerService.retrieveByName(name);
 
 			request.setAttribute("computer", computer);
 			if (computer.getName() != null) {
@@ -54,11 +54,12 @@ public class EditComputerServlet extends HttpServlet {
 				request.setAttribute("companyName", computer.getCompany()
 						.getName());
 			}
-			request.getRequestDispatcher("editComputer.jsp").forward(request,
-					response);
+			request.getRequestDispatcher("WEB-INF/editComputer.jsp").forward(
+					request, response);
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			System.err
+					.println("Erreur lors de la connection: EditComputerServlet");
 			e.printStackTrace();
 		}
 	}

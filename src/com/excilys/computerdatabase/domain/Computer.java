@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class Computer {
 
-	private int id;
+	private Long id;
 	private String name;
 	private Date introduced;
 	private Date discontinued;
@@ -13,11 +13,11 @@ public class Computer {
 	public Computer() {
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -67,7 +67,7 @@ public class Computer {
 		result = prime * result + ((company == null) ? 0 : company.hashCode());
 		result = prime * result
 				+ ((discontinued == null) ? 0 : discontinued.hashCode());
-		result = prime * result + id;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
 				+ ((introduced == null) ? 0 : introduced.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -93,7 +93,10 @@ public class Computer {
 				return false;
 		} else if (!discontinued.equals(other.discontinued))
 			return false;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		if (introduced == null) {
 			if (other.introduced != null)
@@ -108,4 +111,47 @@ public class Computer {
 		return true;
 	}
 
+	public static class Builder {
+
+		Computer computer;
+
+		private Builder() {
+			computer = new Computer();
+		}
+
+		public Builder id(Long id) {
+			if (id != null)
+				this.computer.id = id;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.computer.name = name;
+			return this;
+		}
+
+		public Builder introduced(Date introduced) {
+			this.computer.introduced = introduced;
+			return this;
+		}
+
+		public Builder discontinued(Date discontinued) {
+			this.computer.discontinued = discontinued;
+			return this;
+		}
+
+		public Builder company(Company company) {
+			this.computer.company = company;
+			return this;
+		}
+
+		public Computer build() {
+			return this.computer;
+		}
+
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
 }
