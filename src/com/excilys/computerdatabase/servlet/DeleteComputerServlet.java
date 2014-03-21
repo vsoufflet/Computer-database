@@ -1,7 +1,8 @@
 package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
+import com.excilys.computerdatabase.mapper.ComputerMapper;
 import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 /**
@@ -21,6 +24,9 @@ public class DeleteComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ComputerServiceImpl computerService = new ComputerServiceImpl();
 	PageWrapper pw = new PageWrapper();
+	ComputerMapper cm = new ComputerMapper();
+	List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
+	List<Computer> computerList = new ArrayList<Computer>();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -38,23 +44,17 @@ public class DeleteComputerServlet extends HttpServlet {
 
 		pw = PageWrapper.builder().search("default").orderBy("default")
 				.way("default").build();
-		try {
-			String name = request.getParameter("name");
+		String name = request.getParameter("name");
 
-			Computer computer = computerService.retrieveByName(name);
-			computerService.delete(computer);
+		ComputerDTO computerDTO = computerService.retrieveByName(name);
+		Computer computer = cm.toComputer(computerDTO);
+		computerService.delete(computer);
 
-			pw = PageWrapper.builder()
-					.computerList(computerService.retrieveList(pw)).build();
+		pw = PageWrapper.builder()
+				.computerList(computerService.retrieveList(pw)).build();
 
-			request.setAttribute("PageWrapper", pw);
-			request.getRequestDispatcher("DashboardServlet").forward(request,
-					response);
-
-		} catch (SQLException e) {
-			System.err
-					.println("Erreur lors de la connection: DeleteConnectionServlet");
-			e.printStackTrace();
-		}
+		request.setAttribute("PageWrapper", pw);
+		request.getRequestDispatcher("DashboardServlet").forward(request,
+				response);
 	}
 }

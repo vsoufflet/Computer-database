@@ -1,16 +1,15 @@
 package com.excilys.computerdatabase.service;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import com.excilys.computerdatabase.domain.Company;
 
 public interface CompanyServiceInterface {
 
-	public void create(Company c) throws SQLException;
+	public void create(Company c);
 
-	public Company retrieveById(Long id) throws SQLException;
+	public Company retrieveById(Long id);
 
-	public List<Company> retrieveList() throws SQLException;
+	public List<Company> retrieveList();
 
 }

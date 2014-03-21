@@ -1,7 +1,6 @@
 package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -29,22 +28,16 @@ public class ListCompanyServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		try {
-			List<Company> companyList = companyService.retrieveList();
 
-			request.setAttribute("companyList", companyList);
-			request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
-					request, response);
+		List<Company> companyList = companyService.retrieveList();
 
-		} catch (SQLException e) {
-			System.err
-					.println("Erreur lors de la connection: ListCompanyServlet");
-			e.printStackTrace();
-		}
+		request.setAttribute("companyList", companyList);
+		request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
+				request, response);
 	}
 }

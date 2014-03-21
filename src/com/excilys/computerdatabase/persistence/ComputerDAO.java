@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.excilys.computerdatabase.domain.Company;
 import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.service.CompanyServiceImpl;
 import com.jolbox.bonecp.BoneCP;
@@ -55,13 +55,13 @@ public class ComputerDAO {
 		conn.close();
 	}
 
-	public Computer retrieveByName(String name) throws SQLException {
+	public ComputerDTO retrieveByName(String name) throws SQLException {
 
 		Connection conn;
 		PreparedStatement ps = null;
 		String query = "SELECT * FROM computer WHERE name=?";
 		ResultSet rs = null;
-		Computer computer = new Computer();
+		ComputerDTO cDTO = new ComputerDTO();
 
 		if (connectionPool == null) {
 			connectionPool = df.initialise();
@@ -74,16 +74,16 @@ public class ComputerDAO {
 		rs = ps.executeQuery();
 
 		rs.next();
-		computer.setId(rs.getLong(1));
-		computer.setName(rs.getString(2));
-		computer.setIntroduced(rs.getDate(3));
-		computer.setDiscontinued(rs.getDate(4));
-		computer.setCompany(companyService.retrieveById(rs.getLong(5)));
+		cDTO.setId(rs.getLong(1));
+		cDTO.setName(rs.getString(2));
+		cDTO.setIntroduced(rs.getString(3));
+		cDTO.setDiscontinued(rs.getString(4));
+		cDTO.setCompanyId(rs.getLong(5));
 
 		rs.close();
 		ps.close();
 		conn.close();
-		return computer;
+		return cDTO;
 	}
 
 	public void delete(Computer c) throws SQLException {
@@ -106,31 +106,97 @@ public class ComputerDAO {
 		conn.close();
 	}
 
-	public List<Computer> retrieveAll(PageWrapper pw) {
+	public List<ComputerDTO> retrieveAll(PageWrapper pw) throws SQLException {
 
-		List<Computer> computerList = new ArrayList<Computer>();
+		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
 		Connection conn = null;
 		PreparedStatement ps = null;
 		StringBuffer query = new StringBuffer();
 		ResultSet rs = null;
 
-		try {
-			if (connectionPool == null) {
-				connectionPool = df.initialise();
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
 
-				conn = connectionPool.getConnection();
+			conn = connectionPool.getConnection();
 
-			} else {
-				conn = connectionPool.getConnection();
+		} else {
+			conn = connectionPool.getConnection();
+		}
+
+		if (pw.getSearch().equalsIgnoreCase("default")
+				|| pw.getSearch().equalsIgnoreCase("")) {
+			query = query.append("SELECT * FROM computer");
+		} else {
+			query = query.append("SELECT * FROM computer WHERE name LIKE ?");
+		}
+		if (!pw.getOrderBy().equalsIgnoreCase("default")) {
+			query = query.append(" ORDER BY " + pw.getOrderBy());
+
+			if (!pw.getWay().equalsIgnoreCase("default")) {
+				query = query.append(" " + pw.getWay());
 			}
+		}
 
-			if (pw.getSearch().equalsIgnoreCase("default")
-					|| pw.getSearch().equalsIgnoreCase("")) {
-				query = query.append("SELECT * FROM computer");
-			} else {
+		String sqlQuery = query.toString();
+		ps = conn.prepareStatement(sqlQuery);
+
+		if (!pw.getSearch().equalsIgnoreCase("default")
+				&& !pw.getSearch().equalsIgnoreCase("")) {
+			ps.setString(1, "%" + pw.getSearch() + "%");
+		}
+
+		rs = ps.executeQuery();
+
+		while (rs.next()) {
+			ComputerDTO cDTO = new ComputerDTO();
+			cDTO.setId(rs.getLong(1));
+			cDTO.setName(rs.getString(2));
+			cDTO.setIntroduced(rs.getString(3));
+			cDTO.setDiscontinued(rs.getString(4));
+			cDTO.setCompanyId(rs.getLong(5));
+
+			computerDTOList.add(cDTO);
+		}
+
+		rs.close();
+		ps.close();
+		conn.close();
+
+		return computerDTOList;
+	}
+
+	public List<ComputerDTO> retrieveAllByCompany(PageWrapper pw)
+			throws SQLException {
+
+		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
+		Connection conn = null;
+		PreparedStatement ps = null;
+		StringBuffer query = new StringBuffer();
+		ResultSet rs = null;
+
+		if (connectionPool == null) {
+			connectionPool = df.initialise();
+
+			conn = connectionPool.getConnection();
+
+		} else {
+			conn = connectionPool.getConnection();
+		}
+
+		if (pw.getSearch().equalsIgnoreCase("default")
+				|| pw.getSearch().equalsIgnoreCase("")) {
+			query = query.append("SELECT * FROM computer");
+			if (!pw.getOrderBy().equalsIgnoreCase("default")) {
 				query = query
-						.append("SELECT * FROM computer WHERE name LIKE ?");
+						.append(" INNER JOIN company ON computer.company_id = company.id ORDER BY "
+								+ pw.getOrderBy());
+				if (!pw.getWay().equalsIgnoreCase("default")) {
+					query = query.append(" " + pw.getWay());
+				}
 			}
+		} else {
+			query = query
+					.append("SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ?");
 			if (!pw.getOrderBy().equalsIgnoreCase("default")) {
 				query = query.append(" ORDER BY " + pw.getOrderBy());
 
@@ -138,110 +204,32 @@ public class ComputerDAO {
 					query = query.append(" " + pw.getWay());
 				}
 			}
-			String sqlQuery = query.toString();
-			ps = conn.prepareStatement(sqlQuery);
-			if (!pw.getSearch().equalsIgnoreCase("default")
-					&& !pw.getSearch().equalsIgnoreCase("")) {
-				ps.setString(1, "%" + pw.getSearch() + "%");
-			}
-
-			rs = ps.executeQuery();
-
-			while (rs.next()) {
-				Computer computer = new Computer();
-				computer.setId(rs.getLong(1));
-				computer.setName(rs.getString(2));
-				computer.setIntroduced(rs.getDate(3));
-				computer.setDiscontinued(rs.getDate(4));
-
-				Company company = companyService.retrieveById(rs.getLong(5));
-				computer.setCompany(company);
-
-				computerList.add(computer);
-			}
-
-			rs.close();
-			ps.close();
-			conn.close();
-
-		} catch (SQLException e) {
-			System.err.println("Echec de la connexion.");
-			e.printStackTrace();
 		}
-		return computerList;
-	}
 
-	public List<Computer> retrieveAllByCompany(PageWrapper pw) {
-
-		List<Computer> computerList = new ArrayList<Computer>();
-		Connection conn = null;
-		PreparedStatement ps = null;
-		StringBuffer query = new StringBuffer();
-		ResultSet rs = null;
-
-		try {
-			if (connectionPool == null) {
-				connectionPool = df.initialise();
-
-				conn = connectionPool.getConnection();
-
-			} else {
-				conn = connectionPool.getConnection();
-			}
-
-			if (pw.getSearch().equalsIgnoreCase("default")
-					|| pw.getSearch().equalsIgnoreCase("")) {
-				query = query.append("SELECT * FROM computer");
-				if (!pw.getOrderBy().equalsIgnoreCase("default")) {
-					query = query
-							.append(" INNER JOIN company ON computer.company_id = company.id ORDER BY "
-									+ pw.getOrderBy());
-					if (!pw.getWay().equalsIgnoreCase("default")) {
-						query = query.append(" " + pw.getWay());
-					}
-				}
-			} else {
-				query = query
-						.append("SELECT * FROM computer INNER JOIN company ON computer.company_id = company.id WHERE company.name LIKE ?");
-				if (!pw.getOrderBy().equalsIgnoreCase("default")) {
-					query = query.append(" ORDER BY " + pw.getOrderBy());
-
-					if (!pw.getWay().equalsIgnoreCase("default")) {
-						query = query.append(" " + pw.getWay());
-					}
-				}
-			}
-
-			String sqlQuery = query.toString();
-			ps = conn.prepareStatement(sqlQuery);
-			if (!pw.getSearch().equalsIgnoreCase("default")
-					&& !pw.getSearch().equalsIgnoreCase("")) {
-				ps.setString(1, "%" + pw.getSearch() + "%");
-			}
-
-			rs = ps.executeQuery();
-
-			while (rs.next()) {
-				Computer computer = new Computer();
-				computer.setId(rs.getLong(1));
-				computer.setName(rs.getString(2));
-				computer.setIntroduced(rs.getDate(3));
-				computer.setDiscontinued(rs.getDate(4));
-
-				Company company = companyService.retrieveById(rs.getLong(5));
-				computer.setCompany(company);
-
-				computerList.add(computer);
-			}
-
-			rs.close();
-			ps.close();
-			conn.close();
-
-		} catch (SQLException e) {
-			System.err.println("Echec de la connexion.");
-			e.printStackTrace();
+		String sqlQuery = query.toString();
+		ps = conn.prepareStatement(sqlQuery);
+		if (!pw.getSearch().equalsIgnoreCase("default")
+				&& !pw.getSearch().equalsIgnoreCase("")) {
+			ps.setString(1, "%" + pw.getSearch() + "%");
 		}
-		return computerList;
+
+		rs = ps.executeQuery();
+
+		while (rs.next()) {
+			ComputerDTO cDTO = new ComputerDTO();
+			cDTO.setId(rs.getLong(1));
+			cDTO.setName(rs.getString(2));
+			cDTO.setIntroduced(rs.getString(3));
+			cDTO.setDiscontinued(rs.getString(4));
+			cDTO.setCompanyId(rs.getLong(5));
+
+			computerDTOList.add(cDTO);
+		}
+
+		rs.close();
+		ps.close();
+		conn.close();
+
+		return computerDTOList;
 	}
 }

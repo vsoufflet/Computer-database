@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.excilys.computerdatabase.domain.Computer;
+import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.persistence.ComputerDAO;
 
@@ -13,32 +14,68 @@ public class ComputerServiceImpl implements ComputerServiceInterface {
 	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
 
 	@Override
-	public void create(Computer c) throws SQLException {
-		myComputerDAO.create(c);
+	public void create(Computer c) {
+
+		try {
+			myComputerDAO.create(c);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur lors de la création. Voir ComputerDAO->create()");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public Computer retrieveByName(String name) throws SQLException {
-		Computer computer = myComputerDAO.retrieveByName(name);
-		return computer;
+	public ComputerDTO retrieveByName(String name) {
+		ComputerDTO computerDTO = null;
+		try {
+			computerDTO = myComputerDAO.retrieveByName(name);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur de connexion. Voir ComputerDAO->retrieveByName()");
+			e.printStackTrace();
+		}
+		return computerDTO;
 	}
 
 	@Override
-	public List<Computer> retrieveList(PageWrapper pw) throws SQLException {
-		List<Computer> computerList = myComputerDAO.retrieveAll(pw);
-		return computerList;
+	public List<ComputerDTO> retrieveList(PageWrapper pw) {
+
+		List<ComputerDTO> computerDTOList = null;
+		try {
+			computerDTOList = myComputerDAO.retrieveAll(pw);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur de connexion. Voir ComputerDAO->retrieveAll()");
+			e.printStackTrace();
+		}
+		return computerDTOList;
 	}
 
 	@Override
-	public List<Computer> retrieveListByCompany(PageWrapper pw)
-			throws SQLException {
-		List<Computer> computerList = myComputerDAO.retrieveAllByCompany(pw);
-		return computerList;
+	public List<ComputerDTO> retrieveListByCompany(PageWrapper pw) {
+
+		List<ComputerDTO> computerDTOList = null;
+		try {
+			computerDTOList = myComputerDAO.retrieveAllByCompany(pw);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur de connexion. Voir ComputerDAO->retrieveAllByCompany");
+			e.printStackTrace();
+		}
+		return computerDTOList;
 	}
 
 	@Override
-	public void delete(Computer c) throws SQLException {
-		myComputerDAO.delete(c);
+	public void delete(Computer c) {
+
+		try {
+			myComputerDAO.delete(c);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur de connexion. Voir ComputerDAO->delete()");
+			e.printStackTrace();
+		}
 
 	}
 }

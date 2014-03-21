@@ -1,19 +1,16 @@
 package com.excilys.computerdatabase.servlet;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.excilys.computerdatabase.domain.Company;
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.service.CompanyServiceImpl;
+import com.excilys.computerdatabase.domain.ComputerDTO;
+import com.excilys.computerdatabase.domain.ComputerValidator;
+import com.excilys.computerdatabase.mapper.ComputerMapper;
 import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 @WebServlet("/AddComputerServlet")
@@ -24,7 +21,8 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 	 */
 	private static final long serialVersionUID = 1L;
 	ComputerServiceImpl computerService = new ComputerServiceImpl();
-	CompanyServiceImpl companyService = new CompanyServiceImpl();;
+	ComputerMapper cm = new ComputerMapper();
+	ComputerValidator cv = new ComputerValidator();
 
 	public AddComputerServlet() {
 		super();
@@ -32,36 +30,33 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
-		try {
 
-			SimpleDateFormat parser = new SimpleDateFormat("YYYY-MM-dd");
+		String name = request.getParameter("name");
+		String introduced = request.getParameter("introducedDate");
+		String discontinued = request.getParameter("discontinuedDate");
+		Long companyId = Long.parseLong(request.getParameter("company"));
 
-			String name = request.getParameter("name");
-			Date introduced = parser.parse(request
-					.getParameter("introducedDate"));
-			Date discontinued = parser.parse(request
-					.getParameter("discontinuedDate"));
-			Long companyId = Long.parseLong(request.getParameter("company"));
+		ComputerDTO cDTO = new ComputerDTO();
+		cDTO.setName(name);
+		cDTO.setIntroduced(introduced);
+		cDTO.setDiscontinued(discontinued);
+		cDTO.setCompanyId(companyId);
 
-			Computer computer = new Computer();
-			computer.setName(name);
-			computer.setIntroduced(introduced);
-			computer.setDiscontinued(discontinued);
-			Company company = companyService.retrieveById(companyId);
-			computer.setCompany(company);
+		Computer computer = cm.toComputer(cDTO);
 
-			computerService.create(computer);
-			request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
-					request, response);
+		/*
+		 * boolean valid = cv.validate(computer);
+		 * 
+		 * if (valid == true) { computerService.create(computer);
+		 * request.setAttribute("success",
+		 * "L'ordinateur a été ajouté avec succès."); } else {
+		 * request.setAttribute( "failure",
+		 * "Une erreur est survenue, l'ordinateur n'a pas pu être ajouté. Merci de vérifier les données insérées."
+		 * ); }
+		 */
 
-		} catch (SQLException e) {
-			System.err
-					.println("Erreur lors de la connection: AddComputerServlet");
-			e.printStackTrace();
-		} catch (ParseException e) {
-			System.err.println("Erreur lors du parse de la date.");
-			e.printStackTrace();
-			response.sendRedirect("WEB-INF/addComputer.jsp");
-		}
+		computerService.create(computer);
+		request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
+				request, response);
 	}
 }

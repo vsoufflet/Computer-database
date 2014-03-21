@@ -12,19 +12,43 @@ public class CompanyServiceImpl implements CompanyServiceInterface {
 	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
 
 	@Override
-	public void create(Company c) throws SQLException {
-		myCompanyDAO.create(c);
+	public void create(Company c) {
+
+		try {
+			myCompanyDAO.create(c);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur lors de la création. Voir CompanDAO->create()");
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
-	public Company retrieveById(Long id) throws SQLException {
-		Company company = myCompanyDAO.retrieveById(id);
+	public Company retrieveById(Long id) {
+
+		Company company = null;
+		try {
+			company = myCompanyDAO.retrieveById(id);
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur de chargement depuis la base. Voir CompanyDAO->retrieveList()");
+			e.printStackTrace();
+		}
 		return company;
 	}
 
 	@Override
-	public List<Company> retrieveList() throws SQLException {
-		List<Company> companyList = myCompanyDAO.retrieveList();
+	public List<Company> retrieveList() {
+
+		List<Company> companyList = null;
+		try {
+			companyList = myCompanyDAO.retrieveList();
+		} catch (SQLException e) {
+			System.err
+					.println("Erreur de chargement depuis la base. Voir CompanyDAO->retrieveList()");
+			e.printStackTrace();
+		}
 		return companyList;
 	}
 }
