@@ -25,10 +25,7 @@ public class DashboardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	ComputerServiceImpl computerService = new ComputerServiceImpl();
 	CompanyServiceImpl companyService = new CompanyServiceImpl();
-	PageWrapper pw = new PageWrapper();
-	List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
 	ComputerMapper cm = new ComputerMapper();
-	List<Computer> computerList = new ArrayList<Computer>();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -45,6 +42,10 @@ public class DashboardServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
+
+		PageWrapper pw = new PageWrapper();
+		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
+		List<Computer> computerList = new ArrayList<Computer>();
 
 		String searchBy = request.getParameter("searchBy") == null ? "default"
 				: request.getParameter("searchBy");
@@ -85,7 +86,7 @@ public class DashboardServlet extends HttpServlet {
 			computerList.add(computer);
 		}
 
-		pw = PageWrapper.builder().computerList(computerList).build();
+		pw.setComputerList(computerList);
 		request.setAttribute("PageWrapper", pw);
 
 		if (computerDTOList.size() <= 1) {

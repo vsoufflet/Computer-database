@@ -9,12 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.excilys.computerdatabase.domain.Company;
-import com.jolbox.bonecp.BoneCP;
 
 public class CompanyDAO {
-
-	DAOFactory df = DAOFactory.getInstance();
-	BoneCP connectionPool;
 
 	private static CompanyDAO myDAO = new CompanyDAO();
 
@@ -26,19 +22,11 @@ public class CompanyDAO {
 		return myDAO;
 	}
 
-	public void create(Company c) throws SQLException {
-
-		Connection conn = null;
+	public void create(Company c, Connection conn) throws SQLException {
 
 		PreparedStatement ps = null;
 		String query = "INSERT into computer (name) VALUES(?)";
 
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-			conn = connectionPool.getConnection();
-		} else {
-			conn = connectionPool.getConnection();
-		}
 		ps = conn.prepareStatement(query);
 
 		ps.setString(1, c.getName());
@@ -46,11 +34,10 @@ public class CompanyDAO {
 		ps.executeUpdate();
 
 		ps.close();
-		conn.close();
 	}
 
-	public Company retrieveById(Long id) throws SQLException {
-		List<Company> companyList = retrieveList();
+	public Company retrieveById(Long id, Connection conn) throws SQLException {
+		List<Company> companyList = retrieveList(conn);
 
 		for (Company c : companyList) {
 			if (id == c.getId()) {
@@ -61,20 +48,13 @@ public class CompanyDAO {
 		return null;
 	}
 
-	public List<Company> retrieveList() throws SQLException {
+	public List<Company> retrieveList(Connection conn) throws SQLException {
 
-		Connection conn = null;
 		Statement stmt = null;
 		String query = "SELECT id,name FROM company";
 		ResultSet rs = null;
 		List<Company> companyList = new ArrayList<Company>();
 
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-			conn = connectionPool.getConnection();
-		} else {
-			conn = connectionPool.getConnection();
-		}
 		stmt = (Statement) conn.createStatement();
 		rs = stmt.executeQuery(query);
 
@@ -88,7 +68,6 @@ public class CompanyDAO {
 		}
 		rs.close();
 		stmt.close();
-		conn.close();
 
 		return companyList;
 	}

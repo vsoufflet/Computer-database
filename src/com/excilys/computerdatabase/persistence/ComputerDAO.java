@@ -12,14 +12,12 @@ import com.excilys.computerdatabase.domain.Computer;
 import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.service.CompanyServiceImpl;
-import com.jolbox.bonecp.BoneCP;
 
 public class ComputerDAO {
-	DAOFactory df = DAOFactory.getInstance();
-	BoneCP connectionPool;
+
 	CompanyServiceImpl companyService = new CompanyServiceImpl();
 
-	private static ComputerDAO myDAO = new ComputerDAO();;
+	private static ComputerDAO myDAO = new ComputerDAO();
 
 	private ComputerDAO() {
 
@@ -29,20 +27,12 @@ public class ComputerDAO {
 		return myDAO;
 	}
 
-	public void create(Computer c) throws SQLException {
+	public void create(Computer c, Connection connection) throws SQLException {
 
-		Connection conn = null;
 		PreparedStatement ps = null;
 
 		String query = "INSERT into computer (name,introduced,discontinued,company_id) VALUES(?,?,?,?)";
-
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-			conn = connectionPool.getConnection();
-		} else {
-			conn = connectionPool.getConnection();
-		}
-		ps = conn.prepareStatement(query);
+		ps = connection.prepareStatement(query);
 
 		ps.setString(1, c.getName());
 		ps.setTimestamp(2, new Timestamp(c.getIntroduced().getTime()));
@@ -52,23 +42,16 @@ public class ComputerDAO {
 		ps.executeUpdate();
 
 		ps.close();
-		conn.close();
 	}
 
-	public ComputerDTO retrieveByName(String name) throws SQLException {
+	public ComputerDTO retrieveByName(String name, Connection conn)
+			throws SQLException {
 
-		Connection conn;
 		PreparedStatement ps = null;
 		String query = "SELECT * FROM computer WHERE name=?";
 		ResultSet rs = null;
 		ComputerDTO cDTO = new ComputerDTO();
 
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-			conn = connectionPool.getConnection();
-		} else {
-			conn = connectionPool.getConnection();
-		}
 		ps = conn.prepareStatement(query);
 		ps.setString(1, name);
 		rs = ps.executeQuery();
@@ -82,46 +65,53 @@ public class ComputerDAO {
 
 		rs.close();
 		ps.close();
-		conn.close();
 		return cDTO;
 	}
 
-	public void delete(Computer c) throws SQLException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		String query = "DELETE from computer WHERE id=?";
+	public ComputerDTO retrieveById(Long id, Connection conn)
+			throws SQLException {
 
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-			conn = connectionPool.getConnection();
-		} else {
-			conn = connectionPool.getConnection();
-		}
+		PreparedStatement ps = null;
+		String query = "SELECT * FROM computer WHERE id=?";
+		ResultSet rs = null;
+		ComputerDTO cDTO = new ComputerDTO();
+
+		ps = conn.prepareStatement(query);
+		ps.setLong(1, id);
+		rs = ps.executeQuery();
+
+		rs.next();
+		cDTO.setId(rs.getLong(1));
+		cDTO.setName(rs.getString(2));
+		cDTO.setIntroduced(rs.getString(3));
+		cDTO.setDiscontinued(rs.getString(4));
+		cDTO.setCompanyId(rs.getLong(5));
+
+		rs.close();
+		ps.close();
+		return cDTO;
+	}
+
+	public void delete(Computer c, Connection conn) throws SQLException {
+
+		PreparedStatement ps = null;
+		String query = "DELETE FROM computer WHERE id=?";
+
 		ps = conn.prepareStatement(query);
 		ps.setLong(1, c.getId());
 
 		ps.executeUpdate();
 
 		ps.close();
-		conn.close();
 	}
 
-	public List<ComputerDTO> retrieveAll(PageWrapper pw) throws SQLException {
+	public List<ComputerDTO> retrieveAll(PageWrapper pw, Connection conn)
+			throws SQLException {
 
 		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
-		Connection conn = null;
 		PreparedStatement ps = null;
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 		ResultSet rs = null;
-
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-
-			conn = connectionPool.getConnection();
-
-		} else {
-			conn = connectionPool.getConnection();
-		}
 
 		if (pw.getSearch().equalsIgnoreCase("default")
 				|| pw.getSearch().equalsIgnoreCase("")) {
@@ -160,28 +150,17 @@ public class ComputerDAO {
 
 		rs.close();
 		ps.close();
-		conn.close();
 
 		return computerDTOList;
 	}
 
-	public List<ComputerDTO> retrieveAllByCompany(PageWrapper pw)
-			throws SQLException {
+	public List<ComputerDTO> retrieveAllByCompany(PageWrapper pw,
+			Connection conn) throws SQLException {
 
 		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
-		Connection conn = null;
 		PreparedStatement ps = null;
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 		ResultSet rs = null;
-
-		if (connectionPool == null) {
-			connectionPool = df.initialise();
-
-			conn = connectionPool.getConnection();
-
-		} else {
-			conn = connectionPool.getConnection();
-		}
 
 		if (pw.getSearch().equalsIgnoreCase("default")
 				|| pw.getSearch().equalsIgnoreCase("")) {
@@ -228,7 +207,6 @@ public class ComputerDAO {
 
 		rs.close();
 		ps.close();
-		conn.close();
 
 		return computerDTOList;
 	}

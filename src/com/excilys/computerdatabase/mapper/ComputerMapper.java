@@ -20,16 +20,19 @@ public class ComputerMapper {
 
 	public Computer toComputer(ComputerDTO cDTO) {
 
-		SimpleDateFormat parser = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
 		Computer computer = null;
 
 		try {
 			computer = new Computer();
+			computer.setId(cDTO.getId());
 			computer.setName(cDTO.getName());
-			computer.setIntroduced(parser.parse(cDTO.getIntroduced()));
-
-			computer.setDiscontinued(parser.parse(cDTO.getDiscontinued()));
-
+			if (cDTO.getIntroduced() != null) {
+				computer.setIntroduced(sdf.parse(cDTO.getIntroduced()));
+			}
+			if (cDTO.getDiscontinued() != null) {
+				computer.setDiscontinued(sdf.parse(cDTO.getDiscontinued()));
+			}
 			Company company = myCompanyService
 					.retrieveById(cDTO.getCompanyId());
 			computer.setCompany(company);
@@ -45,9 +48,14 @@ public class ComputerMapper {
 	public ComputerDTO toComputerDTO(Computer c) {
 
 		ComputerDTO cDTO = new ComputerDTO();
+		cDTO.setId(c.getId());
 		cDTO.setName(c.getName());
-		cDTO.setIntroduced(c.getIntroduced().toString());
-		cDTO.setDiscontinued(c.getDiscontinued().toString());
+		if (c.getIntroduced() != null) {
+			cDTO.setIntroduced(c.getIntroduced().toString());
+		}
+		if (c.getDiscontinued() != null) {
+			cDTO.setDiscontinued(c.getDiscontinued().toString());
+		}
 		cDTO.setCompanyId(c.getCompany().getId());
 
 		return cDTO;

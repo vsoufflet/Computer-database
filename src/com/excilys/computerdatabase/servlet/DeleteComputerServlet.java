@@ -22,6 +22,7 @@ import com.excilys.computerdatabase.service.ComputerServiceImpl;
 @WebServlet("/DeleteComputerServlet")
 public class DeleteComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
 	ComputerServiceImpl computerService = new ComputerServiceImpl();
 	PageWrapper pw = new PageWrapper();
 	ComputerMapper cm = new ComputerMapper();
@@ -44,14 +45,19 @@ public class DeleteComputerServlet extends HttpServlet {
 
 		pw = PageWrapper.builder().search("default").orderBy("default")
 				.way("default").build();
-		String name = request.getParameter("name");
+		Long id = Long.valueOf(request.getParameter("id"));
 
-		ComputerDTO computerDTO = computerService.retrieveByName(name);
+		ComputerDTO computerDTO = computerService.retrieveById(id);
 		Computer computer = cm.toComputer(computerDTO);
 		computerService.delete(computer);
 
-		pw = PageWrapper.builder()
-				.computerList(computerService.retrieveList(pw)).build();
+		computerDTOList = computerService.retrieveList(pw);
+		for (ComputerDTO cDTO : computerDTOList) {
+			Computer c = new Computer();
+			c = cm.toComputer(cDTO);
+			computerList.add(c);
+		}
+		pw = PageWrapper.builder().computerList(computerList).build();
 
 		request.setAttribute("PageWrapper", pw);
 		request.getRequestDispatcher("DashboardServlet").forward(request,

@@ -55,7 +55,7 @@
 					<td>${computer.discontinued}</td>
 					<td>${computer.company.name}</td>
 					<td><a class="btn danger" id="Delete"
-						href="DeleteComputerServlet?name=${computer.name}">Delete Computer</a></td>
+						href="DeleteComputerServlet?id=${computer.id}">Delete Computer</a></td>
 				</tr>
 			</c:forEach>
 

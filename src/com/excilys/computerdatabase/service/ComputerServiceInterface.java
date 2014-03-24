@@ -15,6 +15,8 @@ public interface ComputerServiceInterface {
 
 	public ComputerDTO retrieveByName(String name);
 
+	public ComputerDTO retrieveById(Long id);
+
 	public List<ComputerDTO> retrieveList(PageWrapper pw);
 
 	public List<ComputerDTO> retrieveListByCompany(PageWrapper pw);
