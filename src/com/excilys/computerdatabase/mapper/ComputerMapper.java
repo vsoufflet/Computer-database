@@ -11,8 +11,8 @@ import com.excilys.computerdatabase.service.ComputerServiceImpl;
 
 public class ComputerMapper {
 
-	ComputerServiceImpl myComputerService = new ComputerServiceImpl();
-	CompanyServiceImpl myCompanyService = new CompanyServiceImpl();
+	ComputerServiceImpl myComputerService = ComputerServiceImpl.getInstance();
+	CompanyServiceImpl myCompanyService = CompanyServiceImpl.getInstance();
 
 	public ComputerMapper() {
 
@@ -20,7 +20,7 @@ public class ComputerMapper {
 
 	public Computer toComputer(ComputerDTO cDTO) {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		Computer computer = null;
 
 		try {

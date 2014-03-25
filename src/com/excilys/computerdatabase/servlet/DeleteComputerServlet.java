@@ -23,7 +23,7 @@ import com.excilys.computerdatabase.service.ComputerServiceImpl;
 public class DeleteComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	ComputerServiceImpl computerService = new ComputerServiceImpl();
+	ComputerServiceImpl computerService = ComputerServiceImpl.getInstance();
 	PageWrapper pw = new PageWrapper();
 	ComputerMapper cm = new ComputerMapper();
 	List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();

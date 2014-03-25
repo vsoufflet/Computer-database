@@ -20,7 +20,7 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	ComputerServiceImpl computerService = new ComputerServiceImpl();
+	ComputerServiceImpl computerService = ComputerServiceImpl.getInstance();
 	ComputerMapper cm = new ComputerMapper();
 	ComputerValidator cv = new ComputerValidator();
 
@@ -56,7 +56,7 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 		 */
 
 		computerService.create(computer);
-		request.getRequestDispatcher("WEB-INF/addComputer.jsp").forward(
-				request, response);
+		request.getRequestDispatcher("DashboardServlet").forward(request,
+				response);
 	}
 }

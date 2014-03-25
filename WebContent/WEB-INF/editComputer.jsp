@@ -18,14 +18,14 @@
 			<div class="clearfix">
 				<label for="introduced">Introduced date:</label>
 				<div class="input">
-					<input type="date" value="${introduced}" name="introducedDate" pattern="YYYY-MM-dd"/>
+					<input type="date" value="${introduced}" name="introducedDate"/>
 					<span class="help-inline">YYYY-MM-DD</span>
 				</div>
 			</div>
 			<div class="clearfix">
 				<label for="discontinued">Discontinued date:</label>
 				<div class="input" >
-					<input type="date" value="${discontinued}" name="discontinuedDate" pattern="YYYY-MM-dd"/>
+					<input type="date" value="${discontinued}" name="discontinuedDate"/>
 					<span class="help-inline">YYYY-MM-DD</span>
 				</div>
 			</div>

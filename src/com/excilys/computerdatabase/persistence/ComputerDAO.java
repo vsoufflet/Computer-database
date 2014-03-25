@@ -1,10 +1,10 @@
 package com.excilys.computerdatabase.persistence;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import com.excilys.computerdatabase.service.CompanyServiceImpl;
 
 public class ComputerDAO {
 
-	CompanyServiceImpl companyService = new CompanyServiceImpl();
+	CompanyServiceImpl companyService = CompanyServiceImpl.getInstance();
 
 	private static ComputerDAO myDAO = new ComputerDAO();
 
@@ -35,8 +35,8 @@ public class ComputerDAO {
 		ps = connection.prepareStatement(query);
 
 		ps.setString(1, c.getName());
-		ps.setTimestamp(2, new Timestamp(c.getIntroduced().getTime()));
-		ps.setTimestamp(3, new Timestamp(c.getDiscontinued().getTime()));
+		ps.setDate(2, new Date(c.getIntroduced().getTime()));
+		ps.setDate(3, new Date(c.getDiscontinued().getTime()));
 		ps.setObject(4, c.getCompany().getId());
 
 		ps.executeUpdate();

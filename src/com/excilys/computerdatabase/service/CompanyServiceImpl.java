@@ -12,10 +12,19 @@ import com.excilys.computerdatabase.persistence.LogDAO;
 
 public class CompanyServiceImpl implements CompanyServiceInterface {
 
+	private static CompanyServiceImpl myCompanyService = new CompanyServiceImpl();
+
 	CompanyDAO myCompanyDAO = CompanyDAO.getInstance();
 	LogDAO myLogDAO = LogDAO.getInstance();
-
 	ConnectionJDBC connectionJDBC = ConnectionJDBC.getInstance();
+
+	private CompanyServiceImpl() {
+
+	}
+
+	public static CompanyServiceImpl getInstance() {
+		return myCompanyService;
+	}
 
 	@Override
 	public void create(Company c) {

@@ -14,11 +14,21 @@ import com.excilys.computerdatabase.persistence.LogDAO;
 
 public class ComputerServiceImpl implements ComputerServiceInterface {
 
+	private static ComputerServiceImpl myComputerService = new ComputerServiceImpl();
+
 	ComputerDAO myComputerDAO = ComputerDAO.getInstance();
 	LogDAO myLogDAO = LogDAO.getInstance();
 
 	ConnectionJDBC connectionJDBC = ConnectionJDBC.getInstance();
 	Connection conn = connectionJDBC.getConnection();
+
+	private ComputerServiceImpl() {
+
+	}
+
+	public static ComputerServiceImpl getInstance() {
+		return myComputerService;
+	}
 
 	@Override
 	public void create(Computer c) {

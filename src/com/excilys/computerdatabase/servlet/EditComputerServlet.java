@@ -20,7 +20,7 @@ import com.excilys.computerdatabase.service.ComputerServiceImpl;
 @WebServlet("/EditComputerServlet")
 public class EditComputerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ComputerServiceImpl computerService = new ComputerServiceImpl();
+	ComputerServiceImpl computerService = ComputerServiceImpl.getInstance();
 	ComputerMapper cm = new ComputerMapper();
 	ComputerValidator cv = new ComputerValidator();
 

@@ -18,7 +18,7 @@ import com.excilys.computerdatabase.service.CompanyServiceImpl;
 @WebServlet("/ListCompanyServlet")
 public class ListCompanyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	CompanyServiceImpl companyService = new CompanyServiceImpl();
+	CompanyServiceImpl companyService = CompanyServiceImpl.getInstance();
 
 	/**
 	 * @see HttpServlet#HttpServlet()

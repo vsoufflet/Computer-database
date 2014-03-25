@@ -23,8 +23,8 @@ import com.excilys.computerdatabase.service.ComputerServiceImpl;
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	ComputerServiceImpl computerService = new ComputerServiceImpl();
-	CompanyServiceImpl companyService = new CompanyServiceImpl();
+	ComputerServiceImpl computerService = ComputerServiceImpl.getInstance();
+	CompanyServiceImpl companyService = CompanyServiceImpl.getInstance();
 	ComputerMapper cm = new ComputerMapper();
 
 	/**
