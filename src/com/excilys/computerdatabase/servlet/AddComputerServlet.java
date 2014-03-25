@@ -56,7 +56,6 @@ public class AddComputerServlet extends javax.servlet.http.HttpServlet
 		 */
 
 		computerService.create(computer);
-		request.getRequestDispatcher("DashboardServlet").forward(request,
-				response);
+		request.getRequestDispatcher("index.jsp").forward(request, response);
 	}
 }

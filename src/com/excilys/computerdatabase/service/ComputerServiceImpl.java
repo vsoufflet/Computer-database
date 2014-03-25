@@ -20,7 +20,6 @@ public class ComputerServiceImpl implements ComputerServiceInterface {
 	LogDAO myLogDAO = LogDAO.getInstance();
 
 	ConnectionJDBC connectionJDBC = ConnectionJDBC.getInstance();
-	Connection conn = connectionJDBC.getConnection();
 
 	private ComputerServiceImpl() {
 
