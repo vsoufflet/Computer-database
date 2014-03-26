@@ -3,6 +3,9 @@ package com.excilys.computerdatabase.mapper;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.computerdatabase.domain.Company;
 import com.excilys.computerdatabase.domain.Computer;
 import com.excilys.computerdatabase.domain.ComputerDTO;
@@ -13,6 +16,8 @@ public class ComputerMapper {
 
 	ComputerServiceImpl myComputerService = ComputerServiceImpl.getInstance();
 	CompanyServiceImpl myCompanyService = CompanyServiceImpl.getInstance();
+
+	Logger logger = LoggerFactory.getLogger(ComputerMapper.class);
 
 	public ComputerMapper() {
 
@@ -33,12 +38,15 @@ public class ComputerMapper {
 			if (cDTO.getDiscontinued() != null) {
 				computer.setDiscontinued(sdf.parse(cDTO.getDiscontinued()));
 			}
-			Company company = myCompanyService
-					.retrieveById(cDTO.getCompanyId());
-			computer.setCompany(company);
+
+			if (cDTO.getCompanyId() != 0) {
+				Company company = myCompanyService.retrieveById(cDTO
+						.getCompanyId());
+				computer.setCompany(company);
+			}
 
 		} catch (ParseException e) {
-			System.err.println("Erreur lors du parse des dates.");
+			logger.error("Erreur lors du parse des dates.");
 			e.printStackTrace();
 		}
 
@@ -56,7 +64,11 @@ public class ComputerMapper {
 		if (c.getDiscontinued() != null) {
 			cDTO.setDiscontinued(c.getDiscontinued().toString());
 		}
-		cDTO.setCompanyId(c.getCompany().getId());
+
+		if (c.getCompany() != null) {
+			cDTO.setCompany(c.getCompany().getName());
+			cDTO.setCompanyId(c.getCompany().getId());
+		}
 
 		return cDTO;
 	}

@@ -13,6 +13,7 @@ import com.excilys.computerdatabase.domain.Log;
 public class LogDAO {
 
 	private static LogDAO myLogDAO = new LogDAO();
+	ConnectionJDBC connectionJDBC = ConnectionJDBC.getInstance();
 
 	private LogDAO() {
 
@@ -22,8 +23,9 @@ public class LogDAO {
 		return myLogDAO;
 	}
 
-	public void create(Log log, Connection conn) throws SQLException {
+	public void create(Log log) throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 
 		String query = "INSERT into log (type, description) VALUES(?,?)";
@@ -38,8 +40,9 @@ public class LogDAO {
 		ps.close();
 	}
 
-	public List<Log> retrieveAll(Connection conn) throws SQLException {
+	public List<Log> retrieveAll() throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		List<Log> logList = new ArrayList<Log>();
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -63,8 +66,9 @@ public class LogDAO {
 		return logList;
 	}
 
-	public void deleteAll(Connection conn) throws SQLException {
+	public void deleteAll() throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 
 		String query = "DELETE * FROM log";

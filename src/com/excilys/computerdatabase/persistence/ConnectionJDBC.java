@@ -3,6 +3,9 @@ package com.excilys.computerdatabase.persistence;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 
@@ -13,7 +16,10 @@ public class ConnectionJDBC {
 	private static String userName = "root";
 	private static String passWord = "root";
 	private static BoneCP connectionPool;
-	// private ThreadLocal<Connection> threadLocal;
+
+	static Logger logger = LoggerFactory.getLogger(ConnectionJDBC.class);
+
+	private static ThreadLocal<Connection> threadLocal = new ThreadLocal<Connection>();
 
 	private static ConnectionJDBC conn = new ConnectionJDBC();
 
@@ -33,8 +39,13 @@ public class ConnectionJDBC {
 		return conn;
 	}
 
+	public BoneCP getConnectionPool() {
+		return connectionPool;
+	}
+
 	public static void initialise() {
 
+		logger.info("intialising connection pool");
 		try {
 			Class.forName(driver);
 			BoneCPConfig config = new BoneCPConfig();
@@ -47,26 +58,45 @@ public class ConnectionJDBC {
 			config.setPartitionCount(2);
 
 			connectionPool = new BoneCP(config);
-			// threadLocal = new ThreadLocal<Connection>();
 
+			logger.info("intialising connection pool initialised");
 		} catch (SQLException | ClassNotFoundException e) {
-			System.err.println("Erreur d'accès à la base de données.");
+			logger.error("Could not find the mysql driver");
 			e.printStackTrace();
 		}
 	}
 
 	public Connection getConnection() {
-		Connection connection = null;
+		logger.info("retrieving connection from threadLocal");
 		try {
 			if (connectionPool == null) {
 				initialise();
 			}
-			connection = connectionPool.getConnection();
-			connection.setAutoCommit(false);
+			if (threadLocal.get() == null) {
+				threadLocal.set(getInstance().getConnectionPool()
+						.getConnection());
+			}
 		} catch (SQLException e) {
-			System.err.println("La connection n'a pas pu être établie.");
+			logger.error("La connection n'a pas pu être établie.");
 			e.printStackTrace();
 		}
-		return connection;
+		logger.info("return connection");
+		return threadLocal.get();
+	}
+
+	public void close(Connection connection) {
+
+		logger.info("connection closing");
+		try {
+			if (threadLocal != null) {
+				threadLocal.remove();
+			}
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException e) {
+			logger.error("Erreur lors de la fermeture de la connexion.");
+			e.printStackTrace();
+		}
 	}
 }

@@ -13,6 +13,7 @@ import com.excilys.computerdatabase.domain.Company;
 public class CompanyDAO {
 
 	private static CompanyDAO myDAO = new CompanyDAO();
+	ConnectionJDBC connectionJDBC = ConnectionJDBC.getInstance();
 
 	private CompanyDAO() {
 
@@ -22,8 +23,9 @@ public class CompanyDAO {
 		return myDAO;
 	}
 
-	public void create(Company c, Connection conn) throws SQLException {
+	public void create(Company c) throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 		String query = "INSERT into computer (name) VALUES(?)";
 
@@ -36,8 +38,9 @@ public class CompanyDAO {
 		ps.close();
 	}
 
-	public Company retrieveById(Long id, Connection conn) throws SQLException {
-		List<Company> companyList = retrieveList(conn);
+	public Company retrieveById(Long id) throws SQLException {
+
+		List<Company> companyList = retrieveList();
 
 		for (Company c : companyList) {
 			if (id == c.getId()) {
@@ -48,8 +51,9 @@ public class CompanyDAO {
 		return null;
 	}
 
-	public List<Company> retrieveList(Connection conn) throws SQLException {
+	public List<Company> retrieveList() throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		Statement stmt = null;
 		String query = "SELECT id,name FROM company";
 		ResultSet rs = null;

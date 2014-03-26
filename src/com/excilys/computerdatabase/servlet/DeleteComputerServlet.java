@@ -26,8 +26,6 @@ public class DeleteComputerServlet extends HttpServlet {
 	ComputerServiceImpl computerService = ComputerServiceImpl.getInstance();
 	PageWrapper pw = new PageWrapper();
 	ComputerMapper cm = new ComputerMapper();
-	List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
-	List<Computer> computerList = new ArrayList<Computer>();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -43,21 +41,22 @@ public class DeleteComputerServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
+		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
+		List<Computer> computerList = new ArrayList<Computer>();
+
 		pw = PageWrapper.builder().search("default").orderBy("default")
 				.way("default").build();
 		Long id = Long.valueOf(request.getParameter("id"));
 
-		ComputerDTO computerDTO = computerService.retrieveById(id);
-		Computer computer = cm.toComputer(computerDTO);
+		Computer computer = computerService.retrieveById(id);
 		computerService.delete(computer);
 
-		computerDTOList = computerService.retrieveList(pw);
-		for (ComputerDTO cDTO : computerDTOList) {
-			Computer c = new Computer();
-			c = cm.toComputer(cDTO);
-			computerList.add(c);
+		computerList = computerService.retrieveList(pw);
+		for (Computer c : computerList) {
+			ComputerDTO computerDTO = cm.toComputerDTO(c);
+			computerDTOList.add(computerDTO);
 		}
-		pw = PageWrapper.builder().computerList(computerList).build();
+		pw = PageWrapper.builder().computerDTOList(computerDTOList).build();
 
 		request.setAttribute("PageWrapper", pw);
 		request.getRequestDispatcher("DashboardServlet").forward(request,

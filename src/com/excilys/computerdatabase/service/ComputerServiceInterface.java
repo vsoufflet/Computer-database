@@ -3,7 +3,6 @@ package com.excilys.computerdatabase.service;
 import java.util.List;
 
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.persistence.ComputerDAO;
 
@@ -13,13 +12,13 @@ public interface ComputerServiceInterface {
 
 	public void create(Computer c);
 
-	public ComputerDTO retrieveByName(String name);
+	public Computer retrieveByName(String name);
 
-	public ComputerDTO retrieveById(Long id);
+	public Computer retrieveById(Long id);
 
-	public List<ComputerDTO> retrieveList(PageWrapper pw);
+	public List<Computer> retrieveList(PageWrapper pw);
 
-	public List<ComputerDTO> retrieveListByCompany(PageWrapper pw);
+	public List<Computer> retrieveListByCompany(PageWrapper pw);
 
 	public void delete(Computer c);
 

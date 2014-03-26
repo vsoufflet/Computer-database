@@ -18,14 +18,14 @@
 			<div class="clearfix">
 				<label for="introduced">Introduced date:</label>
 				<div class="input">
-					<input type="date" name="introducedDate" pattern="YYYY-MM-dd"/>
+					<input type="text" name="introducedDate" data-validation="date infDiscontinued" data-validation-optional="true"/>
 					<span class="help-inline">YYYY-MM-DD</span>
 				</div>
 			</div>
 			<div class="clearfix">
 				<label for="discontinued">Discontinued date:</label>
 				<div class="input">
-					<input type="date" name="discontinuedDate" pattern="YYYY-MM-dd"/>
+					<input type="text" name="discontinuedDate" data-validation="date supIntroduced" data-validation-optional="true"/>
 					<span class="help-inline">YYYY-MM-DD</span>
 				</div>
 			</div>
@@ -41,6 +41,13 @@
 				</div>
 			</div>
 		</fieldset>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.1.47/jquery.form-validator.min.js"></script>
+		<script>
+			$.validate({
+			modules : 'date'
+			});
+		</script>
 		<div class="actions">
 			<input type="submit" value="Add" class="btn primary">
 			or <a href="DashboardServlet" class="btn">Cancel</a>

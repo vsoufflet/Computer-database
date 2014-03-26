@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.computerdatabase.domain.Computer;
 import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
@@ -43,10 +46,12 @@ public class DashboardServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException {
 
+		Logger logger = LoggerFactory.getLogger(DashboardServlet.class);
 		PageWrapper pw = new PageWrapper();
 		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
 		List<Computer> computerList = new ArrayList<Computer>();
 
+		logger.info("Dashboard started");
 		String searchBy = request.getParameter("searchBy") == null ? "default"
 				: request.getParameter("searchBy");
 		String search = request.getParameter("search") == null ? "default"
@@ -59,34 +64,42 @@ public class DashboardServlet extends HttpServlet {
 		pw = PageWrapper.builder().searchBy(searchBy).search(search)
 				.orderBy(orderBy).way(way).build();
 
+		if (request.getParameter("page") == "1") {
+			pw.setOffset(0);
+
+		} else {
+			pw.setOffset(Integer.parseInt(request.getParameter("page"))
+					* pw.getComputersPerPage());
+		}
+
 		if (searchBy.equalsIgnoreCase("computer")) {
 
 			if (!orderBy.equalsIgnoreCase("company.id")
 					&& !orderBy.equalsIgnoreCase("company.name")) {
-				computerDTOList = computerService.retrieveList(pw);
+				computerList = computerService.retrieveList(pw);
 			} else {
-				computerDTOList = computerService.retrieveListByCompany(pw);
+				computerList = computerService.retrieveListByCompany(pw);
 			}
 
 		} else if (searchBy.equalsIgnoreCase("company")) {
-			computerDTOList = computerService.retrieveListByCompany(pw);
+			computerList = computerService.retrieveListByCompany(pw);
 
 		} else {
 
 			if (!orderBy.equalsIgnoreCase("company.id")
 					&& !orderBy.equalsIgnoreCase("company.name")) {
-				computerDTOList = computerService.retrieveList(pw);
+				computerList = computerService.retrieveList(pw);
 			} else {
-				computerDTOList = computerService.retrieveListByCompany(pw);
+				computerList = computerService.retrieveListByCompany(pw);
 			}
 		}
 
-		for (ComputerDTO cDTO : computerDTOList) {
-			Computer computer = cm.toComputer(cDTO);
-			computerList.add(computer);
+		for (Computer c : computerList) {
+			ComputerDTO computerDTO = cm.toComputerDTO(c);
+			computerDTOList.add(computerDTO);
 		}
 
-		pw.setComputerList(computerList);
+		pw.setComputerDTOList(computerDTOList);
 		request.setAttribute("PageWrapper", pw);
 
 		if (computerDTOList.size() <= 1) {
@@ -94,9 +107,10 @@ public class DashboardServlet extends HttpServlet {
 					+ " computer found");
 		} else {
 			request.setAttribute("NombreOrdinateurs", computerDTOList.size()
-					+ " computerService found");
+					+ " computers found");
 		}
 
+		logger.info("Dashboard ended");
 		request.getRequestDispatcher("WEB-INF/dashboard.jsp").forward(request,
 				response);
 	}

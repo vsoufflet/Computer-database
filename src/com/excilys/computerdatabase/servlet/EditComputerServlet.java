@@ -40,17 +40,17 @@ public class EditComputerServlet extends HttpServlet {
 
 		String name = request.getParameter("name");
 
-		ComputerDTO computerDTO = computerService.retrieveByName(name);
-		Computer computer = cm.toComputer(computerDTO);
+		Computer computer = computerService.retrieveByName(name);
+		ComputerDTO computerDTO = cm.toComputerDTO(computer);
 		request.setAttribute("computer", computer);
 		if (computer.getName() != null) {
-			request.setAttribute("name", computer.getName());
+			request.setAttribute("name", computerDTO.getName());
 		}
 		if (computer.getIntroduced() != null) {
-			request.setAttribute("introduced", computer.getIntroduced());
+			request.setAttribute("introduced", computerDTO.getIntroduced());
 		}
 		if (computer.getDiscontinued() != null) {
-			request.setAttribute("discontinued", computer.getDiscontinued());
+			request.setAttribute("discontinued", computerDTO.getDiscontinued());
 		}
 		if (computer.getCompany() != null) {
 			request.setAttribute("companyId", computer.getCompany().getId());

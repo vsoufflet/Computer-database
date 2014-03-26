@@ -8,14 +8,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.excilys.computerdatabase.domain.Company;
 import com.excilys.computerdatabase.domain.Computer;
-import com.excilys.computerdatabase.domain.ComputerDTO;
 import com.excilys.computerdatabase.domain.PageWrapper;
 import com.excilys.computerdatabase.service.CompanyServiceImpl;
 
 public class ComputerDAO {
 
 	CompanyServiceImpl companyService = CompanyServiceImpl.getInstance();
+	ConnectionJDBC connectionJDBC = ConnectionJDBC.getInstance();
 
 	private static ComputerDAO myDAO = new ComputerDAO();
 
@@ -27,12 +28,13 @@ public class ComputerDAO {
 		return myDAO;
 	}
 
-	public void create(Computer c, Connection connection) throws SQLException {
+	public void create(Computer c) throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 
 		String query = "INSERT into computer (name,introduced,discontinued,company_id) VALUES(?,?,?,?)";
-		ps = connection.prepareStatement(query);
+		ps = conn.prepareStatement(query);
 
 		ps.setString(1, c.getName());
 		ps.setDate(2, new Date(c.getIntroduced().getTime()));
@@ -44,56 +46,60 @@ public class ComputerDAO {
 		ps.close();
 	}
 
-	public ComputerDTO retrieveByName(String name, Connection conn)
-			throws SQLException {
+	public Computer retrieveByName(String name) throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 		String query = "SELECT * FROM computer WHERE name=?";
 		ResultSet rs = null;
-		ComputerDTO cDTO = new ComputerDTO();
+		Computer computer = new Computer();
 
 		ps = conn.prepareStatement(query);
 		ps.setString(1, name);
 		rs = ps.executeQuery();
 
 		rs.next();
-		cDTO.setId(rs.getLong(1));
-		cDTO.setName(rs.getString(2));
-		cDTO.setIntroduced(rs.getString(3));
-		cDTO.setDiscontinued(rs.getString(4));
-		cDTO.setCompanyId(rs.getLong(5));
+		computer.setId(rs.getLong(1));
+		computer.setName(rs.getString(2));
+		computer.setIntroduced(rs.getDate(3));
+		computer.setDiscontinued(rs.getDate(4));
+
+		Company company = companyService.retrieveById(rs.getLong(5));
+		computer.setCompany(company);
 
 		rs.close();
 		ps.close();
-		return cDTO;
+		return computer;
 	}
 
-	public ComputerDTO retrieveById(Long id, Connection conn)
-			throws SQLException {
+	public Computer retrieveById(Long id) throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 		String query = "SELECT * FROM computer WHERE id=?";
 		ResultSet rs = null;
-		ComputerDTO cDTO = new ComputerDTO();
+		Computer computer = new Computer();
 
 		ps = conn.prepareStatement(query);
 		ps.setLong(1, id);
 		rs = ps.executeQuery();
 
-		rs.next();
-		cDTO.setId(rs.getLong(1));
-		cDTO.setName(rs.getString(2));
-		cDTO.setIntroduced(rs.getString(3));
-		cDTO.setDiscontinued(rs.getString(4));
-		cDTO.setCompanyId(rs.getLong(5));
-
+		while (rs.next()) {
+			computer.setId(rs.getLong(1));
+			computer.setName(rs.getString(2));
+			computer.setIntroduced(rs.getDate(3));
+			computer.setDiscontinued(rs.getDate(4));
+			Company company = companyService.retrieveById(rs.getLong(5));
+			computer.setCompany(company);
+		}
 		rs.close();
 		ps.close();
-		return cDTO;
+		return computer;
 	}
 
-	public void delete(Computer c, Connection conn) throws SQLException {
+	public void delete(Computer c) throws SQLException {
 
+		Connection conn = connectionJDBC.getConnection();
 		PreparedStatement ps = null;
 		String query = "DELETE FROM computer WHERE id=?";
 
@@ -105,10 +111,10 @@ public class ComputerDAO {
 		ps.close();
 	}
 
-	public List<ComputerDTO> retrieveAll(PageWrapper pw, Connection conn)
-			throws SQLException {
+	public List<Computer> retrieveAll(PageWrapper pw) throws SQLException {
 
-		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
+		Connection conn = connectionJDBC.getConnection();
+		List<Computer> computerList = new ArrayList<Computer>();
 		PreparedStatement ps = null;
 		StringBuilder query = new StringBuilder();
 		ResultSet rs = null;
@@ -126,38 +132,45 @@ public class ComputerDAO {
 				query = query.append(" " + pw.getWay());
 			}
 		}
-
+		query = query.append(" LIMIT ?, ?");
 		String sqlQuery = query.toString();
 		ps = conn.prepareStatement(sqlQuery);
 
 		if (!pw.getSearch().equalsIgnoreCase("default")
 				&& !pw.getSearch().equalsIgnoreCase("")) {
 			ps.setString(1, "%" + pw.getSearch() + "%");
+			ps.setInt(2, pw.getOffset());
+			ps.setInt(3, pw.getComputersPerPage());
+		} else {
+			ps.setInt(1, pw.getOffset());
+			ps.setInt(2, pw.getComputersPerPage());
 		}
 
 		rs = ps.executeQuery();
 
 		while (rs.next()) {
-			ComputerDTO cDTO = new ComputerDTO();
-			cDTO.setId(rs.getLong(1));
-			cDTO.setName(rs.getString(2));
-			cDTO.setIntroduced(rs.getString(3));
-			cDTO.setDiscontinued(rs.getString(4));
-			cDTO.setCompanyId(rs.getLong(5));
+			Computer computer = new Computer();
+			computer.setId(rs.getLong(1));
+			computer.setName(rs.getString(2));
+			computer.setIntroduced(rs.getDate(3));
+			computer.setDiscontinued(rs.getDate(4));
+			Company company = companyService.retrieveById(rs.getLong(5));
+			computer.setCompany(company);
 
-			computerDTOList.add(cDTO);
+			computerList.add(computer);
 		}
 
 		rs.close();
 		ps.close();
 
-		return computerDTOList;
+		return computerList;
 	}
 
-	public List<ComputerDTO> retrieveAllByCompany(PageWrapper pw,
-			Connection conn) throws SQLException {
+	public List<Computer> retrieveAllByCompany(PageWrapper pw)
+			throws SQLException {
 
-		List<ComputerDTO> computerDTOList = new ArrayList<ComputerDTO>();
+		Connection conn = connectionJDBC.getConnection();
+		List<Computer> computerList = new ArrayList<Computer>();
 		PreparedStatement ps = null;
 		StringBuilder query = new StringBuilder();
 		ResultSet rs = null;
@@ -185,29 +198,37 @@ public class ComputerDAO {
 			}
 		}
 
+		query = query.append(" LIMIT ?, ?");
 		String sqlQuery = query.toString();
 		ps = conn.prepareStatement(sqlQuery);
+
 		if (!pw.getSearch().equalsIgnoreCase("default")
 				&& !pw.getSearch().equalsIgnoreCase("")) {
 			ps.setString(1, "%" + pw.getSearch() + "%");
+			ps.setInt(2, pw.getOffset());
+			ps.setInt(3, pw.getComputersPerPage());
+		} else {
+			ps.setInt(1, pw.getOffset());
+			ps.setInt(2, pw.getComputersPerPage());
 		}
 
 		rs = ps.executeQuery();
 
 		while (rs.next()) {
-			ComputerDTO cDTO = new ComputerDTO();
-			cDTO.setId(rs.getLong(1));
-			cDTO.setName(rs.getString(2));
-			cDTO.setIntroduced(rs.getString(3));
-			cDTO.setDiscontinued(rs.getString(4));
-			cDTO.setCompanyId(rs.getLong(5));
+			Computer computer = new Computer();
+			computer.setId(rs.getLong(1));
+			computer.setName(rs.getString(2));
+			computer.setIntroduced(rs.getDate(3));
+			computer.setDiscontinued(rs.getDate(4));
+			Company company = companyService.retrieveById(rs.getLong(5));
+			computer.setCompany(company);
 
-			computerDTOList.add(cDTO);
+			computerList.add(computer);
 		}
 
 		rs.close();
 		ps.close();
 
-		return computerDTOList;
+		return computerList;
 	}
 }

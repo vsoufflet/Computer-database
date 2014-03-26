@@ -1,6 +1,6 @@
 <jsp:include page="include/header.jsp" />
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<%@ taglib uri="/WEB-INF/PaginationTag.tld" prefix="paging" %>
 <section id="main">
 	<h1 id="homeTitle">${NombreOrdinateurs}</h1>
 	<div id="actions">
@@ -47,20 +47,21 @@
 		</thead>
 		<tbody>
 
-			<c:forEach var="computer" items="${PageWrapper.computerList}">
+			<c:forEach var="computerDTO" items="${PageWrapper.computerDTOList}">
 				<tr>
-					<td><a href="EditComputerServlet?name=${computer.name}"><c:out
-								value="${computer.name}" /></a></td>
-					<td>${computer.introduced}</td>
-					<td>${computer.discontinued}</td>
-					<td>${computer.company.name}</td>
+					<td><a href="EditComputerServlet?name=${computerDTO.name}"><c:out
+								value="${computerDTO.name}" /></a></td>
+					<td>${computerDTO.introduced}</td>
+					<td>${computerDTO.discontinued}</td>
+					<td>${computerDTO.company}</td>
 					<td><a class="btn danger" id="Delete"
-						href="DeleteComputerServlet?id=${computer.id}">Delete Computer</a></td>
+						href="DeleteComputerServlet?id=${computerDTO.id}">Delete Computer</a></td>
 				</tr>
 			</c:forEach>
 
 		</tbody>
 	</table>
+	<paging:display totalRecords="${NombreOrdinateurs}" recordsPerPage="15"/>
 </section>
 
 <jsp:include page="include/footer.jsp" />

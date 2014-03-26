@@ -10,10 +10,10 @@ public class PageWrapper {
 	private String way;
 	private int offset;
 	private int numberOfPages;
-	private int computersPerPage;
+	private int computersPerPage = 12;
 	private int currentPage;
 	private int numberOfComputers;
-	private List<Computer> computerList;
+	private List<ComputerDTO> computerDTOList;
 
 	public PageWrapper() {
 	}
@@ -90,12 +90,12 @@ public class PageWrapper {
 		this.numberOfComputers = numberOfComputers;
 	}
 
-	public List<Computer> getComputerList() {
-		return computerList;
+	public List<ComputerDTO> getComputerDTOList() {
+		return computerDTOList;
 	}
 
-	public void setComputerList(List<Computer> computerList) {
-		this.computerList = computerList;
+	public void setComputerDTOList(List<ComputerDTO> computerDTOList) {
+		this.computerDTOList = computerDTOList;
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class PageWrapper {
 				+ offset + ", numberOfPages=" + numberOfPages
 				+ ", computersPerPage=" + computersPerPage + ", currentPage="
 				+ currentPage + ", numberOfComputers=" + numberOfComputers
-				+ ", computerList=" + computerList + "";
+				+ ", computerDTOList=" + computerDTOList + "";
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class PageWrapper {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((computerList == null) ? 0 : computerList.hashCode());
+				+ ((computerDTOList == null) ? 0 : computerDTOList.hashCode());
 		result = prime * result + computersPerPage;
 		result = prime * result + currentPage;
 		result = prime * result + numberOfComputers;
@@ -136,10 +136,10 @@ public class PageWrapper {
 		if (getClass() != obj.getClass())
 			return false;
 		PageWrapper other = (PageWrapper) obj;
-		if (computerList == null) {
-			if (other.computerList != null)
+		if (computerDTOList == null) {
+			if (other.computerDTOList != null)
 				return false;
-		} else if (!computerList.equals(other.computerList))
+		} else if (!computerDTOList.equals(other.computerDTOList))
 			return false;
 		if (computersPerPage != other.computersPerPage)
 			return false;
@@ -228,8 +228,8 @@ public class PageWrapper {
 			return this;
 		}
 
-		public Builder computerList(List<Computer> computerList) {
-			this.pageWrapper.setComputerList(computerList);
+		public Builder computerDTOList(List<ComputerDTO> computerDTOList) {
+			this.pageWrapper.setComputerDTOList(computerDTOList);
 			return this;
 		}
 

@@ -6,23 +6,73 @@ public class ComputerDTO {
 	private String name;
 	private String introduced;
 	private String discontinued;
+	private String company;
 	private Long companyId;
 
 	public ComputerDTO() {
 		super();
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getIntroduced() {
+		return introduced;
+	}
+
+	public void setIntroduced(String introduced) {
+		this.introduced = introduced;
+	}
+
+	public String getDiscontinued() {
+		return discontinued;
+	}
+
+	public void setDiscontinued(String discontinued) {
+		this.discontinued = discontinued;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public Long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Long companyId) {
+		this.companyId = companyId;
+	}
+
 	@Override
 	public String toString() {
-		return "ComputerDTO id=" + id + ", name=" + name + ", introduced="
-				+ introduced + ", discontinued=" + discontinued
-				+ ", companyId=" + companyId + "";
+		return "ComputerDTO [id=" + id + ", name=" + name + ", introduced="
+				+ introduced + ", discontinued=" + discontinued + ", company="
+				+ company + ", companyId=" + companyId + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((company == null) ? 0 : company.hashCode());
 		result = prime * result
 				+ ((companyId == null) ? 0 : companyId.hashCode());
 		result = prime * result
@@ -43,6 +93,11 @@ public class ComputerDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		ComputerDTO other = (ComputerDTO) obj;
+		if (company == null) {
+			if (other.company != null)
+				return false;
+		} else if (!company.equals(other.company))
+			return false;
 		if (companyId == null) {
 			if (other.companyId != null)
 				return false;
@@ -96,8 +151,8 @@ public class ComputerDTO {
 			return this;
 		}
 
-		public Builder companyId(Long companyId) {
-			this.computerDTO.companyId = companyId;
+		public Builder company(String company) {
+			this.computerDTO.company = company;
 			return this;
 		}
 
@@ -108,45 +163,5 @@ public class ComputerDTO {
 		public static Builder builder() {
 			return new Builder();
 		}
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getIntroduced() {
-		return introduced;
-	}
-
-	public void setIntroduced(String introduced) {
-		this.introduced = introduced;
-	}
-
-	public String getDiscontinued() {
-		return discontinued;
-	}
-
-	public void setDiscontinued(String discontinued) {
-		this.discontinued = discontinued;
-	}
-
-	public Long getCompanyId() {
-		return companyId;
-	}
-
-	public void setCompanyId(Long companyId) {
-		this.companyId = companyId;
 	}
 }
